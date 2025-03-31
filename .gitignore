@@ -3,3 +3,5 @@ vendor/
 
 # 📌 Ignorer les dépendances Node.js (on les installe avec `npm install`)
 node_modules/
+
+# 📌 En cas de soucis avec la database lors de la merge ou clonage : cmd "php artisan migrate"
