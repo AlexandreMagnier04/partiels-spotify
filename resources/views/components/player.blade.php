@@ -38,6 +38,5 @@
         <div class="progress" style="width: 100px;">
             <div class="progress-bar" style="width: 70%"></div>
         </div>
-        <button class="btn-link"><i class="fas fa-expand"></i></button>
     </div>
 </div>

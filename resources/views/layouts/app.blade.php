@@ -32,7 +32,6 @@
                     </div>
                     
                     <div class="user-controls">
-                        <button class="btn-outline">Premium</button>
                         <div class="user-dropdown">
                             <button class="btn-circle btn-dark user-menu-button">
                                 <i class="fas fa-user"></i>
@@ -44,6 +43,7 @@
                                 <a href="#" class="dropdown-item">Déconnexion</a>
                             </div>
                         </div>
+                        <button class="btn-outline">Premium</button>
                     </div>
                 </header>
                 

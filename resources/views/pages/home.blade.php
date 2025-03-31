@@ -104,6 +104,20 @@
                 </div>
             </div>
             @endforeach
+            @foreach($newReleases as $album)
+            <div class="grid-item">
+                <div class="card">
+                    <div class="card-img-container">
+                        <img src="{{ $album->getImageUrl() }}" class="card-img" alt="{{ $album->getName() }}">
+                        <button class="play-btn-overlay"><i class="fas fa-play"></i></button>
+                    </div>
+                    <h3 class="card-title">
+                        <a href="{{ route('albumDetails', ['id' => $album->getId()]) }}">{{ $album->getName() }}</a>
+                    </h3>
+                    <p class="card-text">{{ $album->getArtist() }}</p>
+                </div>
+            </div>
+            @endforeach
         </div>
     </section>
 @endsection
