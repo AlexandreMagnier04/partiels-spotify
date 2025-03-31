@@ -173,7 +173,7 @@ ul {
     align-items: center;
     padding: 16px 32px;
     position: fixed;
-    width: calc(100vw - 240px);
+    width: calc(100vw - var(--sidebar-width));
     top: 0px;
     z-index: 10;
     background-color: var(--spotify-black-dark);
@@ -602,7 +602,6 @@ ul {
     .currently-playing,
     .player-controls,
     .volume-controls {
-        width: 100%;
         margin-bottom: 8px;
     }
     .album-thumbnail{
@@ -620,6 +619,14 @@ ul {
     .control-buttons button:first-child, 
     .control-buttons button:last-child{
         display: none;
+    }
+
+    .welcome-section{
+        margin-top: 10vh;
+    }
+
+    .main-header {
+        width: 100vw;
     }
 }
 
@@ -644,11 +651,19 @@ ul {
     .control-buttons button:last-child{
         display: none;
     }
+
+    .welcome-section{
+        margin-top: 8vh;
+    }
 }
 
 @media (min-width: 1025px) and (max-width: 1440px) {
     .grid {
         grid-template-columns: repeat(4, 1fr);
+    }
+
+    .welcome-section{
+        margin-top: 7%;
     }
 }
 
