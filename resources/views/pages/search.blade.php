@@ -3,13 +3,12 @@
 @section('title', 'Recherche')
 
 @section('content')
-<div class="container-fluid px-4 py-3">
     <!-- Barre de recherche -->
-    <div class="search-container mb-4">
+    <div class="search-container">
         <form action="{{ route('search') }}" method="GET">
-            <div class="input-group input-group-lg">
-                <span class="input-group-text bg-white"><i class="fas fa-search"></i></span>
-                <input type="text" class="form-control" name="q" placeholder="Que souhaitez-vous écouter ?" value="{{ $query }}">
+            <div class="search-input-wrapper">
+                <i class="fas fa-search search-icon"></i>
+                <input type="text" class="search-input" name="q" placeholder="Que souhaitez-vous écouter ?" value="{{ $query }}">
             </div>
         </form>
     </div>
@@ -19,37 +18,37 @@
         <div class="search-results">
             <!-- Titres -->
             @if(count($results['tracks']) > 0)
-                <section class="tracks-section mb-5">
-                    <div class="d-flex justify-content-between align-items-center mb-3">
+                <section class="section">
+                    <div class="section-header">
                         <h2 class="section-title">Titres</h2>
-                        <a href="#" class="text-muted text-decoration-none">VOIR TOUT</a>
+                        <a href="#" class="see-all-link">Voir tout</a>
                     </div>
                     
                     <div class="tracks-table">
-                        <table class="table table-dark table-hover">
+                        <table class="table">
                             <thead>
                                 <tr>
-                                    <th scope="col">#</th>
-                                    <th scope="col">Titre</th>
-                                    <th scope="col">Album</th>
-                                    <th scope="col" class="text-center"><i class="far fa-clock"></i></th>
+                                    <th>#</th>
+                                    <th>Titre</th>
+                                    <th>Album</th>
+                                    <th><i class="far fa-clock"></i></th>
                                 </tr>
                             </thead>
                             <tbody>
                                 @foreach($results['tracks'] as $index => $track)
                                 <tr>
-                                    <td>{{ $index + 1 }}</td>
+                                    <td class="track-number">{{ $index + 1 }}</td>
                                     <td>
-                                        <div class="d-flex align-items-center">
-                                            <img src="{{ $track->getImageUrl() }}" alt="{{ $track->getName() }}" width="40" height="40" class="me-3">
+                                        <div class="track-title-cell">
+                                            <img src="{{ $track->getImageUrl() }}" alt="{{ $track->getName() }}" width="40" height="40">
                                             <div>
-                                                <div><a href="{{ route('trackDetails', ['id' => $track->getId()]) }}" class="text-light text-decoration-none">{{ $track->getName() }}</a></div>
+                                                <div><a href="{{ route('trackDetails', ['id' => $track->getId()]) }}">{{ $track->getName() }}</a></div>
                                                 <div class="text-muted">{{ $track->getArtist() }}</div>
                                             </div>
                                         </div>
                                     </td>
-                                    <td><a href="{{ route('albumDetails', ['id' => $track->getAlbumId()]) }}" class="text-light text-decoration-none">{{ $track->getAlbumName() }}</a></td>
-                                    <td class="text-center">{{ $track->getFormattedDuration() }}</td>
+                                    <td><a href="{{ route('albumDetails', ['id' => $track->getAlbumId()]) }}">{{ $track->getAlbumName() }}</a></td>
+                                    <td class="track-duration">{{ $track->getFormattedDuration() }}</td>
                                 </tr>
                                 @endforeach
                             </tbody>
@@ -60,21 +59,21 @@
             
             <!-- Artistes -->
             @if(count($results['artists']) > 0)
-                <section class="artists-section mb-5">
-                    <div class="d-flex justify-content-between align-items-center mb-3">
+                <section class="section">
+                    <div class="section-header">
                         <h2 class="section-title">Artistes</h2>
-                        <a href="#" class="text-muted text-decoration-none">VOIR TOUT</a>
+                        <a href="#" class="see-all-link">Voir tout</a>
                     </div>
                     
-                    <div class="row row-cols-2 row-cols-md-3 row-cols-lg-4 row-cols-xl-5 g-3">
+                    <div class="grid">
                         @foreach($results['artists'] as $artist)
-                        <div class="col">
-                            <div class="card bg-spotify-card h-100 text-center">
-                                <img src="{{ $artist->getImageUrl() }}" class="card-img-top rounded-circle mx-auto mt-3" alt="{{ $artist->getName() }}" style="width: 150px; height: 150px; object-fit: cover;">
-                                <div class="card-body">
-                                    <h5 class="card-title">{{ $artist->getName() }}</h5>
-                                    <p class="card-text text-muted">Artiste • {{ $artist->getFormattedFollowers() }} followers</p>
+                        <div class="grid-item">
+                            <div class="card artist-card">
+                                <div class="card-img-container">
+                                    <img src="{{ $artist->getImageUrl() }}" class="card-img artist-img" alt="{{ $artist->getName() }}">
                                 </div>
+                                <h3 class="card-title">{{ $artist->getName() }}</h3>
+                                <p class="card-text">Artiste • {{ $artist->getFormattedFollowers() }} followers</p>
                             </div>
                         </div>
                         @endforeach
@@ -84,26 +83,22 @@
             
             <!-- Albums -->
             @if(count($results['albums']) > 0)
-                <section class="albums-section mb-5">
-                    <div class="d-flex justify-content-between align-items-center mb-3">
+                <section class="section">
+                    <div class="section-header">
                         <h2 class="section-title">Albums</h2>
-                        <a href="#" class="text-muted text-decoration-none">VOIR TOUT</a>
+                        <a href="#" class="see-all-link">Voir tout</a>
                     </div>
                     
-                    <div class="row row-cols-2 row-cols-md-3 row-cols-lg-4 row-cols-xl-5 g-3">
+                    <div class="grid">
                         @foreach($results['albums'] as $album)
-                        <div class="col">
-                            <div class="card bg-spotify-card h-100">
-                                <div class="card-img-container position-relative">
-                                    <img src="{{ $album->getImageUrl() }}" class="card-img-top" alt="{{ $album->getName() }}">
-                                    <button class="btn btn-success play-btn-overlay rounded-circle position-absolute d-none">
-                                        <i class="fas fa-play"></i>
-                                    </button>
+                        <div class="grid-item">
+                            <div class="card">
+                                <div class="card-img-container">
+                                    <img src="{{ $album->getImageUrl() }}" class="card-img" alt="{{ $album->getName() }}">
+                                    <button class="play-btn-overlay"><i class="fas fa-play"></i></button>
                                 </div>
-                                <div class="card-body">
-                                    <h5 class="card-title"><a href="{{ route('albumDetails', ['id' => $album->getId()]) }}" class="text-light text-decoration-none">{{ $album->getName() }}</a></h5>
-                                    <p class="card-text text-muted">{{ $album->getArtist() }} • {{ $album->getReleaseDate() }}</p>
-                                </div>
+                                <h3 class="card-title"><a href="{{ route('albumDetails', ['id' => $album->getId()]) }}">{{ $album->getName() }}</a></h3>
+                                <p class="card-text">{{ $album->getArtist() }} • {{ $album->getReleaseDate() }}</p>
                             </div>
                         </div>
                         @endforeach
@@ -113,28 +108,24 @@
             
             <!-- Playlists -->
             @if(count($results['playlists']) > 0)
-                <section class="playlists-section mb-5">
-                    <div class="d-flex justify-content-between align-items-center mb-3">
+                <section class="section">
+                    <div class="section-header">
                         <h2 class="section-title">Playlists</h2>
-                        <a href="#" class="text-muted text-decoration-none">VOIR TOUT</a>
+                        <a href="#" class="see-all-link">Voir tout</a>
                     </div>
                     
-                    <div class="row row-cols-2 row-cols-md-3 row-cols-lg-4 row-cols-xl-5 g-3">
+                    <div class="grid">
                         @foreach($results['playlists'] as $playlist)
-                        <div class="col">
-                            <div class="card bg-spotify-card h-100">
-                                <div class="card-img-container position-relative">
-                                    <img src="{{ $playlist->getImageUrl() }}" class="card-img-top" alt="{{ $playlist->getName() }}">
-                                    <button class="btn btn-success play-btn-overlay rounded-circle position-absolute d-none">
-                                        <i class="fas fa-play"></i>
-                                    </button>
+                        <div class="grid-item">
+                            <div class="card">
+                                <div class="card-img-container">
+                                    <img src="{{ $playlist->getImageUrl() }}" class="card-img" alt="{{ $playlist->getName() }}">
+                                    <button class="play-btn-overlay"><i class="fas fa-play"></i></button>
                                 </div>
-                                <div class="card-body">
-                                    <h5 class="card-title">{{ $playlist->getName() }}</h5>
-                                    <p class="card-text text-muted">{{ $playlist->getDescription() }}</p>
-                                </div>
-                                <div class="card-footer bg-transparent border-0">
-                                    <small class="text-muted">Par {{ $playlist->getOwner() }} • {{ $playlist->getTracksCount() }} titres</small>
+                                <h3 class="card-title">{{ $playlist->getName() }}</h3>
+                                <p class="card-text">{{ $playlist->getDescription() }}</p>
+                                <div class="card-footer">
+                                    <span class="text-muted">Par {{ $playlist->getOwner() }} • {{ $playlist->getTracksCount() }} titres</span>
                                 </div>
                             </div>
                         </div>
@@ -144,7 +135,7 @@
             @endif
             
             @if(count($results['tracks']) === 0 && count($results['artists']) === 0 && count($results['albums']) === 0 && count($results['playlists']) === 0)
-                <div class="no-results text-center py-5">
+                <div class="no-results">
                     <h3>Aucun résultat trouvé pour "{{ $query }}"</h3>
                     <p class="text-muted">Vérifiez l'orthographe des mots ou essayez d'autres mots-clés.</p>
                 </div>
@@ -153,45 +144,21 @@
     @else
         <!-- Explorer les genres -->
         <div class="genres-container">
-            <h2 class="section-title mb-4">Parcourir tout</h2>
-            <div class="row row-cols-2 row-cols-md-3 row-cols-lg-4 row-cols-xl-5 g-3">
+            <h2 class="section-title">Parcourir tout</h2>
+            <div class="genres-grid">
                 @foreach($genres as $genre)
-                <div class="col">
-                    <div class="card genre-card" style="background-color: {{ '#' . substr(md5($genre), 0, 6) }};">
-                        <div class="card-body">
-                            <h3 class="genre-title">{{ $genre }}</h3>
-                        </div>
-                    </div>
+                <div class="genre-card animated-item" style="background-color: {{ '#' . substr(md5($genre), 0, 6) }};">
+                    <h3 class="genre-title">{{ $genre }}</h3>
                 </div>
                 @endforeach
             </div>
         </div>
     @endif
-</div>
 @endsection
 
 @push('scripts')
 <script>
-    // Script pour afficher les boutons play au survol
     document.addEventListener('DOMContentLoaded', function() {
-        const cards = document.querySelectorAll('.card');
-        
-        cards.forEach(card => {
-            card.addEventListener('mouseenter', function() {
-                const playBtn = this.querySelector('.play-btn-overlay');
-                if (playBtn) {
-                    playBtn.classList.remove('d-none');
-                }
-            });
-            
-            card.addEventListener('mouseleave', function() {
-                const playBtn = this.querySelector('.play-btn-overlay');
-                if (playBtn) {
-                    playBtn.classList.add('d-none');
-                }
-            });
-        });
-        
         // Animation d'entrée pour les cartes de genre
         const genreCards = document.querySelectorAll('.genre-card');
         genreCards.forEach((card, index) => {
@@ -203,6 +170,51 @@
                 card.style.opacity = '1';
                 card.style.transform = 'translateY(0)';
             }, 100 + (index * 50));
+        });
+        
+        // Gestion du survol pour les boutons de lecture
+        const cards = document.querySelectorAll('.card');
+        cards.forEach(card => {
+            const playBtn = card.querySelector('.play-btn-overlay');
+            
+            if (playBtn) {
+                card.addEventListener('mouseenter', function() {
+                    playBtn.style.opacity = '1';
+                });
+                
+                card.addEventListener('mouseleave', function() {
+                    playBtn.style.opacity = '0';
+                });
+                
+                // Gestion du clic sur le bouton play
+                playBtn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    
+                    const icon = this.querySelector('i');
+                    if (icon.classList.contains('fa-play')) {
+                        icon.classList.remove('fa-play');
+                        icon.classList.add('fa-pause');
+                        
+                        // Mettre à jour le lecteur (simulation)
+                        const playerTrackName = document.querySelector('.track-name');
+                        const playerArtistName = document.querySelector('.track-artist');
+                        const playerCover = document.querySelector('.album-thumbnail');
+                        
+                        if (playerTrackName && playerArtistName && playerCover) {
+                            const trackTitle = card.querySelector('.card-title').textContent;
+                            const artistInfo = card.querySelector('.card-text').textContent.split('•')[0].trim();
+                            const coverImg = card.querySelector('.card-img').src;
+                            
+                            playerTrackName.textContent = trackTitle;
+                            playerArtistName.textContent = artistInfo;
+                            playerCover.src = coverImg;
+                        }
+                    } else {
+                        icon.classList.remove('fa-pause');
+                        icon.classList.add('fa-play');
+                    }
+                });
+            }
         });
     });
 </script>

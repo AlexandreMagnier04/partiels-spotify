@@ -9,7 +9,6 @@ use App\Models\Playlist;
 use App\Models\TrackDetails;
 use Carbon\Carbon;
 
-
 class SpotifyController extends Controller
 {
     private $client;
@@ -442,7 +441,7 @@ class SpotifyController extends Controller
     {
         return [
             new Playlist('playlist1', 'Today\'s Top Hits', 'The most played tracks right now', 'Spotify', '/img/covers/todays-top-hits.jpg', 50),
-            new Playlist('playlist2', 'RapCaviar', 'Hip hopheavyweight playlist', 'Spotify', '/img/covers/rapcaviar.jpg', 50),
+            new Playlist('playlist2', 'RapCaviar', 'Hip hop heavyweight playlist', 'Spotify', '/img/covers/rapcaviar.jpg', 50),
             new Playlist('playlist3', 'Rock Classics', 'Rock legends & epic songs', 'Spotify', '/img/covers/rock-classics.jpg', 75),
             new Playlist('playlist4', 'Chill Hits', 'Kick back with the chillest tracks', 'Spotify', '/img/covers/chill-hits.jpg', 100),
             new Playlist('playlist5', 'Dance Party', 'Move to the rhythm', 'Spotify', '/img/covers/dance-party.jpg', 80),

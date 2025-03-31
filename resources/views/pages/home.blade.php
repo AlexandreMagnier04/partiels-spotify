@@ -3,41 +3,32 @@
 @section('title', 'Accueil')
 
 @section('content')
-<div class="container-fluid px-4 py-3">
     <!-- Section d'accueil personnalisée -->
-    <div class="welcome-section mb-5">
-        <h1 class="greeting-text mb-4">Bonjour</h1>
+    <div class="welcome-section">
+        <h1 class="greeting-text">Bonjour</h1>
         
-        <div class="row row-cols-2 row-cols-md-3 row-cols-lg-3 g-3">
+        <div class="shortcuts-grid">
             <!-- Raccourcis d'accès rapide -->
-            <div class="col">
-                <div class="card bg-spotify-card h-100">
-                    <div class="card-horizontal d-flex align-items-center">
-                        <img src="/img/covers/liked-songs.jpg" alt="Titres likés" class="shortcut-img" width="80" height="80">
-                        <div class="card-body">
-                            <h5 class="card-title">Titres likés</h5>
-                        </div>
-                        <button class="btn btn-success play-btn-overlay rounded-circle me-3 d-none">
-                            <i class="fas fa-play"></i>
-                        </button>
+            <div class="shortcut-item">
+                <div class="shortcut-card">
+                    <img src="/img/covers/liked-songs.jpg" alt="Titres likés" class="shortcut-img">
+                    <div class="shortcut-info">
+                        <h5>Titres likés</h5>
                     </div>
+                    <button class="play-btn-overlay"><i class="fas fa-play"></i></button>
                 </div>
             </div>
             
             <!-- Morceaux récemment écoutés -->
             @foreach($recentlyPlayed as $track)
                 @if($loop->index < 5)
-                <div class="col">
-                    <div class="card bg-spotify-card h-100">
-                        <div class="card-horizontal d-flex align-items-center">
-                            <img src="{{ $track->getImageUrl() }}" alt="{{ $track->getName() }}" class="shortcut-img" width="80" height="80">
-                            <div class="card-body">
-                                <h5 class="card-title">{{ $track->getName() }}</h5>
-                            </div>
-                            <button class="btn btn-success play-btn-overlay rounded-circle me-3 d-none">
-                                <i class="fas fa-play"></i>
-                            </button>
+                <div class="shortcut-item">
+                    <div class="shortcut-card">
+                        <img src="{{ $track->getImageUrl() }}" alt="{{ $track->getName() }}" class="shortcut-img">
+                        <div class="shortcut-info">
+                            <h5>{{ $track->getName() }}</h5>
                         </div>
+                        <button class="play-btn-overlay"><i class="fas fa-play"></i></button>
                     </div>
                 </div>
                 @endif
@@ -46,26 +37,22 @@
     </div>
     
     <!-- Section des playlists mises en avant -->
-    <section class="featured-playlists mb-5">
-        <div class="d-flex justify-content-between align-items-center mb-3">
+    <section class="section">
+        <div class="section-header">
             <h2 class="section-title">Playlists Spotify</h2>
-            <a href="{{ route('featuredPlaylists') }}" class="text-muted text-decoration-none">VOIR TOUT</a>
+            <a href="{{ route('featuredPlaylists') }}" class="see-all-link">Voir tout</a>
         </div>
         
-        <div class="row row-cols-2 row-cols-md-3 row-cols-lg-4 row-cols-xl-5 g-3">
+        <div class="grid">
             @foreach($featuredPlaylists as $playlist)
-            <div class="col">
-                <div class="card bg-spotify-card h-100">
-                    <div class="card-img-container position-relative">
-                        <img src="{{ $playlist->getImageUrl() }}" class="card-img-top" alt="{{ $playlist->getName() }}">
-                        <button class="btn btn-success play-btn-overlay rounded-circle position-absolute d-none">
-                            <i class="fas fa-play"></i>
-                        </button>
+            <div class="grid-item">
+                <div class="card">
+                    <div class="card-img-container">
+                        <img src="{{ $playlist->getImageUrl() }}" class="card-img" alt="{{ $playlist->getName() }}">
+                        <button class="play-btn-overlay"><i class="fas fa-play"></i></button>
                     </div>
-                    <div class="card-body">
-                        <h5 class="card-title">{{ $playlist->getName() }}</h5>
-                        <p class="card-text text-muted">{{ $playlist->getDescription() }}</p>
-                    </div>
+                    <h3 class="card-title">{{ $playlist->getName() }}</h3>
+                    <p class="card-text">{{ $playlist->getDescription() }}</p>
                 </div>
             </div>
             @endforeach
@@ -73,26 +60,22 @@
     </section>
     
     <!-- Section de recommandations personnalisées -->
-    <section class="recommendations mb-5">
-        <div class="d-flex justify-content-between align-items-center mb-3">
+    <section class="section">
+        <div class="section-header">
             <h2 class="section-title">Créé pour vous</h2>
-            <a href="{{ route('recommendations') }}" class="text-muted text-decoration-none">VOIR TOUT</a>
+            <a href="{{ route('recommendations') }}" class="see-all-link">Voir tout</a>
         </div>
         
-        <div class="row row-cols-2 row-cols-md-3 row-cols-lg-4 row-cols-xl-5 g-3">
+        <div class="grid">
             @foreach($recommendations as $recommendation)
-            <div class="col">
-                <div class="card bg-spotify-card h-100">
-                    <div class="card-img-container position-relative">
-                        <img src="{{ $recommendation->getImageUrl() }}" class="card-img-top" alt="{{ $recommendation->getName() }}">
-                        <button class="btn btn-success play-btn-overlay rounded-circle position-absolute d-none">
-                            <i class="fas fa-play"></i>
-                        </button>
+            <div class="grid-item">
+                <div class="card">
+                    <div class="card-img-container">
+                        <img src="{{ $recommendation->getImageUrl() }}" class="card-img" alt="{{ $recommendation->getName() }}">
+                        <button class="play-btn-overlay"><i class="fas fa-play"></i></button>
                     </div>
-                    <div class="card-body">
-                        <h5 class="card-title">{{ $recommendation->getName() }}</h5>
-                        <p class="card-text text-muted">{{ $recommendation->getDescription() }}</p>
-                    </div>
+                    <h3 class="card-title">{{ $recommendation->getName() }}</h3>
+                    <p class="card-text">{{ $recommendation->getDescription() }}</p>
                 </div>
             </div>
             @endforeach
@@ -100,32 +83,29 @@
     </section>
     
     <!-- Section des nouvelles sorties -->
-    <section class="new-releases mb-5">
-        <div class="d-flex justify-content-between align-items-center mb-3">
+    <section class="section">
+        <div class="section-header">
             <h2 class="section-title">Nouvelles sorties</h2>
-            <a href="{{ route('newReleases') }}" class="text-muted text-decoration-none">VOIR TOUT</a>
+            <a href="{{ route('newReleases') }}" class="see-all-link">Voir tout</a>
         </div>
         
-        <div class="row row-cols-2 row-cols-md-3 row-cols-lg-4 row-cols-xl-5 g-3">
+        <div class="grid">
             @foreach($newReleases as $album)
-            <div class="col">
-                <div class="card bg-spotify-card h-100">
-                    <div class="card-img-container position-relative">
-                        <img src="{{ $album->getImageUrl() }}" class="card-img-top" alt="{{ $album->getName() }}">
-                        <button class="btn btn-success play-btn-overlay rounded-circle position-absolute d-none">
-                            <i class="fas fa-play"></i>
-                        </button>
+            <div class="grid-item">
+                <div class="card">
+                    <div class="card-img-container">
+                        <img src="{{ $album->getImageUrl() }}" class="card-img" alt="{{ $album->getName() }}">
+                        <button class="play-btn-overlay"><i class="fas fa-play"></i></button>
                     </div>
-                    <div class="card-body">
-                        <h5 class="card-title"><a href="{{ route('albumDetails', ['id' => $album->getId()]) }}" class="text-light text-decoration-none">{{ $album->getName() }}</a></h5>
-                        <p class="card-text text-muted">{{ $album->getArtist() }}</p>
-                    </div>
+                    <h3 class="card-title">
+                        <a href="{{ route('albumDetails', ['id' => $album->getId()]) }}">{{ $album->getName() }}</a>
+                    </h3>
+                    <p class="card-text">{{ $album->getArtist() }}</p>
                 </div>
             </div>
             @endforeach
         </div>
     </section>
-</div>
 @endsection
 
 @push('scripts')
@@ -133,20 +113,31 @@
     // Script pour afficher les boutons play au survol
     document.addEventListener('DOMContentLoaded', function() {
         const cards = document.querySelectorAll('.card');
+        const shortcuts = document.querySelectorAll('.shortcut-card');
         
+        // Gestion du survol pour les cartes
         cards.forEach(card => {
+            const playBtn = card.querySelector('.play-btn-overlay');
+            
             card.addEventListener('mouseenter', function() {
-                const playBtn = this.querySelector('.play-btn-overlay');
-                if (playBtn) {
-                    playBtn.classList.remove('d-none');
-                }
+                if (playBtn) playBtn.style.opacity = '1';
             });
             
             card.addEventListener('mouseleave', function() {
-                const playBtn = this.querySelector('.play-btn-overlay');
-                if (playBtn) {
-                    playBtn.classList.add('d-none');
-                }
+                if (playBtn) playBtn.style.opacity = '0';
+            });
+        });
+        
+        // Gestion du survol pour les raccourcis
+        shortcuts.forEach(shortcut => {
+            const playBtn = shortcut.querySelector('.play-btn-overlay');
+            
+            shortcut.addEventListener('mouseenter', function() {
+                if (playBtn) playBtn.style.opacity = '1';
+            });
+            
+            shortcut.addEventListener('mouseleave', function() {
+                if (playBtn) playBtn.style.opacity = '0';
             });
         });
         
@@ -183,14 +174,21 @@
                     const playerCover = document.querySelector('.album-thumbnail');
                     
                     if (playerTrackName && playerArtistName && playerCover) {
-                        const card = this.closest('.card');
-                        const trackTitle = card.querySelector('.card-title').textContent;
+                        const card = this.closest('.card') || this.closest('.shortcut-card');
+                        const trackTitle = card.querySelector('.card-title')?.textContent || card.querySelector('h5')?.textContent;
                         const artistInfo = card.querySelector('.card-text')?.textContent || 'Artiste';
                         const coverImg = card.querySelector('img').src;
                         
                         playerTrackName.textContent = trackTitle;
                         playerArtistName.textContent = artistInfo;
                         playerCover.src = coverImg;
+                        
+                        // Changer l'icône du bouton play principal
+                        const mainPlayBtn = document.querySelector('.player-controls .play-btn i');
+                        if (mainPlayBtn) {
+                            mainPlayBtn.classList.remove('fa-play');
+                            mainPlayBtn.classList.add('fa-pause');
+                        }
                     }
                 } else {
                     icon.classList.remove('fa-pause');

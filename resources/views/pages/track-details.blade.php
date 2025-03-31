@@ -1,260 +1,348 @@
 @extends('layouts.app')
 
-@section('title', $albumDetails->getName())
+@section('title', $trackDetails->getName())
 
 @section('content')
-<div class="container-fluid px-4 py-3">
-    <!-- Header avec image et info album -->
-    <div class="album-header mb-5">
-        <div class="row align-items-end">
-            <div class="col-md-3 mb-3 mb-md-0">
-                <img src="{{ $albumDetails->getImageUrl() }}" alt="{{ $albumDetails->getName() }}" class="img-fluid rounded shadow album-cover">
-            </div>
-            <div class="col-md-9">
-                <div class="album-info">
-                    <h6 class="text-uppercase text-muted small">ALBUM</h6>
-                    <h1 class="display-4 fw-bold mb-2">{{ $albumDetails->getName() }}</h1>
-                    <div class="d-flex align-items-center mb-3">
-                        <img src="{{ $albumDetails->getImageUrl() }}" alt="{{ $albumDetails->getArtist() }}" class="rounded-circle me-2" width="30" height="30">
-                        <a href="#" class="fw-bold link-light text-decoration-none">{{ $albumDetails->getArtist() }}</a>
-                        <span class="mx-2">•</span>
-                        <span>{{ $albumDetails->getReleaseDate() }}</span>
-                        <span class="mx-2">•</span>
-                        <span>{{ $albumDetails->getTotalTracks() }} titres</span>
-                        @if($albumDetails->getFormattedDuration() !== 'Unknown')
-                        <span class="mx-2">•</span>
-                        <span>{{ $albumDetails->getFormattedDuration() }}</span>
-                        @endif
+    <div class="track-details-section">
+        <!-- Image et informations de base -->
+        <div class="track-image-container">
+            <img src="{{ $trackDetails->getImageUrl() }}" alt="{{ $trackDetails->getName() }}" class="track-image">
+            
+            <div class="track-basic-info">
+                <h1 class="track-title">{{ $trackDetails->getName() }}</h1>
+                <p class="track-artist">
+                    Par <strong>{{ $trackDetails->getArtistsString() }}</strong>
+                </p>
+                <p class="track-album">
+                    Album : <a href="{{ route('albumDetails', ['id' => $trackDetails->getAlbumId()]) }}">{{ $trackDetails->getAlbumName() }}</a>
+                </p>
+                <p class="track-release">
+                    Sortie le {{ $trackDetails->getReleaseDate() }}
+                </p>
+                
+                <div class="track-actions">
+                    <button class="btn-success play-track" data-preview="{{ $trackDetails->getPreviewUrl() }}">
+                        <i class="fas fa-play"></i> Écouter
+                    </button>
+                    <button class="btn-outline">
+                        <i class="far fa-heart"></i>
+                    </button>
+                    <button class="btn-outline">
+                        <i class="fas fa-plus"></i>
+                    </button>
+                    <div class="track-dropdown">
+                        <button class="btn-outline dropdown-toggle">
+                            <i class="fas fa-ellipsis-h"></i>
+                        </button>
+                        <div class="dropdown-menu">
+                            <a class="dropdown-item" href="#"><i class="fas fa-share-alt"></i> Partager</a>
+                            <a class="dropdown-item" href="#"><i class="fas fa-link"></i> Copier le lien</a>
+                            <div class="dropdown-divider"></div>
+                            <a class="dropdown-item" href="#"><i class="fas fa-exclamation-circle"></i> Signaler</a>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="track-stats">
+                    <div class="stat-item">
+                        <i class="fas fa-chart-line"></i> Popularité 
+                        <span class="badge">{{ $trackDetails->getPopularity() }}/100</span>
+                    </div>
+                    <div class="stat-item">
+                        <i class="fas fa-clock"></i> Durée 
+                        <span>{{ $trackDetails->getFormattedDuration() }}</span>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
-    
-    <!-- Actions -->
-    <div class="album-actions mb-4">
-        <div class="d-flex align-items-center">
-            <button class="btn btn-success btn-lg me-3 play-all">
-                <i class="fas fa-play"></i>
-            </button>
-            <button class="btn btn-outline-light me-2">
-                <i class="far fa-heart"></i>
-            </button>
-            <button class="btn btn-outline-light me-2">
-                <i class="fas fa-download"></i>
-            </button>
-            <div class="dropdown">
-                <button class="btn btn-outline-light dropdown-toggle" type="button" id="albumOptionsDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-                    <i class="fas fa-ellipsis-h"></i>
-                </button>
-                <ul class="dropdown-menu dropdown-menu-dark" aria-labelledby="albumOptionsDropdown">
-                    <li><a class="dropdown-item" href="#"><i class="fas fa-share-alt me-2"></i> Partager</a></li>
-                    <li><a class="dropdown-item" href="#"><i class="fas fa-link me-2"></i> Copier le lien</a></li>
-                    <li><hr class="dropdown-divider"></li>
-                    <li><a class="dropdown-item" href="#"><i class="fas fa-exclamation-circle me-2"></i> Signaler</a></li>
-                </ul>
+        
+        <!-- Caractéristiques audio et visualisations -->
+        <div class="track-info-container">
+            <div class="audio-player-section">
+                <h2>Extrait audio</h2>
+                @if($trackDetails->getPreviewUrl())
+                <audio id="audio-player" controls>
+                    <source src="{{ $trackDetails->getPreviewUrl() }}" type="audio/mpeg">
+                    Votre navigateur ne supporte pas l'élément audio.
+                </audio>
+                <p class="preview-note">Extrait de 30 secondes</p>
+                @else
+                <p class="no-preview">Aucun extrait disponible pour ce titre</p>
+                @endif
             </div>
-        </div>
-    </div>
-    
-    <!-- Liste des titres -->
-    <div class="album-tracks mb-5">
-        <div class="table-responsive">
-            <table class="table table-dark table-hover track-list">
-                <thead>
-                    <tr>
-                        <th scope="col">#</th>
-                        <th scope="col">Titre</th>
-                        <th scope="col" class="text-center">Popularité</th>
-                        <th scope="col" class="text-center"><i class="far fa-clock"></i></th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @if($albumDetails->getTracks())
-                        @foreach($albumDetails->getTracks() as $index => $track)
+            
+            <div class="audio-features-section">
+                <h2>Caractéristiques audio</h2>
+                <div class="audio-features">
+                    <!-- Danceability -->
+                    <div class="feature-item">
+                        <div class="feature-value">{{ number_format($trackDetails->getDanceability() * 100) }}%</div>
+                        <div class="feature-label">Danceability</div>
+                        <div class="feature-progress">
+                            <div class="progress">
+                                <div class="progress-bar" style="width: {{ $trackDetails->getDanceability() * 100 }}%; background-color: #1DB954;"></div>
+                            </div>
+                        </div>
+                        <div class="feature-description">Mesure à quel point le morceau est adapté à la danse.</div>
+                    </div>
+                    
+                    <!-- Energy -->
+                    <div class="feature-item">
+                        <div class="feature-value">{{ number_format($trackDetails->getEnergy() * 100) }}%</div>
+                        <div class="feature-label">Energy</div>
+                        <div class="feature-progress">
+                            <div class="progress">
+                                <div class="progress-bar" style="width: {{ $trackDetails->getEnergy() * 100 }}%; background-color: #FF5722;"></div>
+                            </div>
+                        </div>
+                        <div class="feature-description">Représente l'intensité et l'activité perçues.</div>
+                    </div>
+                    
+                    <!-- Tempo -->
+                    <div class="feature-item">
+                        <div class="feature-value">{{ round($trackDetails->getTempo()) }}</div>
+                        <div class="feature-label">Tempo (BPM)</div>
+                        <div class="feature-description">Vitesse ou rythme estimé en battements par minute.</div>
+                    </div>
+                    
+                    <!-- Key & Mode -->
+                    <div class="feature-item">
+                        <div class="feature-value">{{ $trackDetails->getKeyName() }}</div>
+                        <div class="feature-label">Tonalité <span class="badge">{{ $trackDetails->getModeName() }}</span></div>
+                        <div class="feature-description">Tonalité musicale du morceau.</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Recommandations -->
+            <div class="similar-tracks-section">
+                <h2>Titres similaires</h2>
+                <table class="table">
+                    <thead>
                         <tr>
-                            <td>{{ $index + 1 }}</td>
-                            <td>
-                                <a href="{{ route('trackDetails', ['id' => $track->getId()]) }}" class="text-light text-decoration-none track-title">{{ $track->getName() }}</a>
-                            </td>
-                            <td class="text-center">
-                                <div class="popularity-bar">
-                                    @php
-                                        // Simuler un score de popularité si non disponible
-                                        $popularity = mt_rand(60, 90);
-                                    @endphp
-                                    <div class="progress" style="height: 4px;">
-                                        <div class="progress-bar bg-light" role="progressbar" style="width: {{ $popularity }}%" aria-valuenow="{{ $popularity }}" aria-valuemin="0" aria-valuemax="100"></div>
-                                    </div>
-                                </div>
-                            </td>
-                            <td class="text-center">{{ $track->getFormattedDuration() }}</td>
+                            <th class="track-number">#</th>
+                            <th>Titre</th>
+                            <th>Album</th>
+                            <th class="track-duration"><i class="far fa-clock"></i></th>
                         </tr>
-                        @endforeach
-                    @else
-                        @for($i = 1; $i <= $albumDetails->getTotalTracks(); $i++)
+                    </thead>
+                    <tbody>
+                        @for($i = 1; $i <= 5; $i++)
                         <tr>
-                            <td>{{ $i }}</td>
-                            <td>Titre {{ $i }}</td>
-                            <td class="text-center">
-                                <div class="popularity-bar">
-                                    @php
-                                        $popularity = mt_rand(60, 90);
-                                    @endphp
-                                    <div class="progress" style="height: 4px;">
-                                        <div class="progress-bar bg-light" role="progressbar" style="width: {{ $popularity }}%" aria-valuenow="{{ $popularity }}" aria-valuemin="0" aria-valuemax="100"></div>
+                            <td class="track-number">{{ $i }}</td>
+                            <td>
+                                <div class="track-title-cell">
+                                    <img src="{{ $trackDetails->getImageUrl() }}" alt="Similar Track {{ $i }}" width="40" height="40">
+                                    <div>
+                                        <div>Similar Track {{ $i }}</div>
+                                        <div class="text-muted">{{ $trackDetails->getArtistsString() }}</div>
                                     </div>
                                 </div>
                             </td>
-                            <td class="text-center">3:{{ str_pad(mt_rand(10, 59), 2, '0', STR_PAD_LEFT) }}</td>
+                            <td>{{ $trackDetails->getAlbumName() }}</td>
+                            <td class="track-duration">3:{{ 10 + $i * 5 }}</td>
                         </tr>
                         @endfor
-                    @endif
-                </tbody>
-            </table>
-        </div>
-    </div>
-    
-    <!-- Informations complémentaires -->
-    <div class="album-details mb-5">
-        <div class="row">
-            <div class="col-md-6">
-                <div class="card bg-spotify-card">
-                    <div class="card-header">
-                        <h2>À propos de l'album</h2>
-                    </div>
-                    <div class="card-body">
-                        @if(count($albumDetails->getGenres()) > 0)
-                            <div class="mb-3">
-                                <h5>Genres</h5>
-                                <div class="d-flex flex-wrap">
-                                    @foreach($albumDetails->getGenres() as $genre)
-                                    <span class="badge bg-secondary m-1 p-2">{{ $genre }}</span>
-                                    @endforeach
-                                </div>
-                            </div>
-                        @endif
-                        
-                        <div class="mb-3">
-                            <h5>Popularité</h5>
-                            <div class="progress mb-2" style="height: 8px;">
-                                <div class="progress-bar bg-success" role="progressbar" style="width: {{ $albumDetails->getPopularity() ?? 75 }}%"></div>
-                            </div>
-                            <p class="text-muted small">Score de popularité sur Spotify</p>
-                        </div>
-                        
-                        @if($albumDetails->getLabel())
-                            <div class="mb-3">
-                                <h5>Label</h5>
-                                <p>{{ $albumDetails->getLabel() }}</p>
-                            </div>
-                        @endif
-                        
-                        @if($albumDetails->getCopyright())
-                            <div>
-                                <h5>Copyright</h5>
-                                <p class="text-muted small">{{ $albumDetails->getCopyright() }}</p>
-                            </div>
-                        @endif
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-6 mt-4 mt-md-0">
-                <div class="card bg-spotify-card">
-                    <div class="card-header d-flex justify-content-between align-items-center">
-                        <h2>Artiste</h2>
-                        <a href="#" class="text-muted">VOIR PLUS</a>
-                    </div>
-                    <div class="card-body">
-                        <div class="d-flex align-items-center mb-3">
-                            <img src="{{ $albumDetails->getImageUrl() }}" alt="{{ $albumDetails->getArtist() }}" class="rounded-circle me-3" width="80" height="80">
-                            <div>
-                                <h4>{{ $albumDetails->getArtist() }}</h4>
-                                <p class="text-muted">{{ number_format(mt_rand(1000000, 50000000)) }} auditeurs mensuels</p>
-                            </div>
-                        </div>
-                        <button class="btn btn-outline-light">SUIVRE</button>
-                    </div>
-                </div>
+                    </tbody>
+                </table>
             </div>
         </div>
     </div>
-    
-    <!-- Albums similaires -->
-    <div class="similar-albums mb-4">
-        <h2 class="mb-3">Plus par {{ $albumDetails->getArtist() }}</h2>
-        <div class="row row-cols-2 row-cols-md-3 row-cols-lg-4 row-cols-xl-5 g-3">
-            @for($i = 1; $i <= 5; $i++)
-            <div class="col">
-                <div class="card bg-spotify-card h-100">
-                    <div class="card-img-container position-relative">
-                        <img src="{{ $albumDetails->getImageUrl() }}" class="card-img-top" alt="Album similaire {{ $i }}">
-                        <button class="btn btn-success play-btn-overlay rounded-circle position-absolute d-none">
-                            <i class="fas fa-play"></i>
-                        </button>
-                    </div>
-                    <div class="card-body">
-                        <h5 class="card-title">Album {{ $i }} de {{ $albumDetails->getArtist() }}</h5>
-                        <p class="card-text text-muted">{{ mt_rand(2018, 2024) }}</p>
-                    </div>
-                </div>
-            </div>
-            @endfor
-        </div>
-    </div>
-</div>
 @endsection
 
 @push('scripts')
 <script>
-    // Script pour afficher les boutons play au survol
     document.addEventListener('DOMContentLoaded', function() {
-        const cards = document.querySelectorAll('.card');
+        // Lecteur audio
+        const audioPlayer = document.getElementById('audio-player');
+        const playButton = document.querySelector('.play-track');
         
-        cards.forEach(card => {
-            card.addEventListener('mouseenter', function() {
-                const playBtn = this.querySelector('.play-btn-overlay');
-                if (playBtn) {
-                    playBtn.classList.remove('d-none');
+        if (playButton && audioPlayer) {
+            playButton.addEventListener('click', function() {
+                if (audioPlayer.paused) {
+                    audioPlayer.play();
+                    this.innerHTML = '<i class="fas fa-pause"></i> Pause';
+                } else {
+                    audioPlayer.pause();
+                    this.innerHTML = '<i class="fas fa-play"></i> Écouter';
                 }
             });
             
-            card.addEventListener('mouseleave', function() {
-                const playBtn = this.querySelector('.play-btn-overlay');
-                if (playBtn) {
-                    playBtn.classList.add('d-none');
-                }
-            });
-        });
-        
-        // Gestion du bouton de lecture de l'album
-        const playAllButton = document.querySelector('.play-all');
-        if (playAllButton) {
-            playAllButton.addEventListener('click', function() {
-                // Dans une implémentation réelle, ceci lancerait la lecture de l'album
-                // Pour la démo, on change juste l'icône du bouton
-                const icon = this.querySelector('i');
-                if (icon.classList.contains('fa-play')) {
-                    icon.classList.remove('fa-play');
-                    icon.classList.add('fa-pause');
-                } else {
-                    icon.classList.remove('fa-pause');
-                    icon.classList.add('fa-play');
-                }
+            audioPlayer.addEventListener('ended', function() {
+                playButton.innerHTML = '<i class="fas fa-play"></i> Écouter';
             });
         }
         
-        // Animer les barres de popularité au chargement
-        const popularityBars = document.querySelectorAll('.popularity-bar .progress-bar');
-        popularityBars.forEach(bar => {
-            const targetWidth = bar.style.width;
-            bar.style.width = '0%';
+        // Dropdown menu
+        const dropdownToggle = document.querySelector('.dropdown-toggle');
+        const dropdownMenu = document.querySelector('.dropdown-menu');
+        
+        if (dropdownToggle && dropdownMenu) {
+            dropdownToggle.addEventListener('click', function(e) {
+                e.stopPropagation();
+                dropdownMenu.style.display = dropdownMenu.style.display === 'block' ? 'none' : 'block';
+            });
             
-            setTimeout(() => {
-                bar.style.transition = 'width 1s';
-                bar.style.width = targetWidth;
-            }, 200);
-        });
+            document.addEventListener('click', function(e) {
+                if (!dropdownToggle.contains(e.target) && !dropdownMenu.contains(e.target)) {
+                    dropdownMenu.style.display = 'none';
+                }
+            });
+        }
     });
 </script>
+@endpush
+
+@push('styles')
+<style>
+    .track-details-section {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 40px;
+    }
+    
+    .track-image-container {
+        flex: 0 0 300px;
+    }
+    
+    .track-image {
+        width: 100%;
+        border-radius: 8px;
+        box-shadow: 0 4px 60px rgba(0, 0, 0, 0.5);
+        margin-bottom: 24px;
+    }
+    
+    .track-info-container {
+        flex: 1;
+        min-width: 300px;
+    }
+    
+    .track-title {
+        font-size: 2.5rem;
+        font-weight: 700;
+        margin-bottom: 8px;
+    }
+    
+    .track-artist, .track-album, .track-release {
+        margin-bottom: 8px;
+    }
+    
+    .track-actions {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin: 24px 0;
+    }
+    
+    .track-stats {
+        margin-top: 24px;
+        display: flex;
+        gap: 24px;
+    }
+    
+    .stat-item {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    
+    .badge {
+        background-color: var(--spotify-green);
+        color: white;
+        padding: 4px 8px;
+        border-radius: 12px;
+        font-size: 0.8rem;
+    }
+    
+    /* Audio player */
+    .audio-player-section {
+        margin-bottom: 40px;
+    }
+    
+    #audio-player {
+        width: 100%;
+        margin-top: 16px;
+        background-color: var(--spotify-dark-gray);
+        border-radius: 8px;
+    }
+    
+    .preview-note {
+        text-align: center;
+        color: var(--spotify-off-white);
+        margin-top: 8px;
+        font-size: 0.9rem;
+    }
+    
+    .no-preview {
+        color: var(--spotify-off-white);
+        text-align: center;
+        padding: 24px;
+        background-color: var(--spotify-dark-gray);
+        border-radius: 8px;
+    }
+    
+    /* Audio features */
+    .audio-features-section {
+        margin-bottom: 40px;
+    }
+    
+    .audio-features {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+        gap: 24px;
+        margin-top: 24px;
+    }
+    
+    .feature-item {
+        background-color: var(--spotify-dark-gray);
+        border-radius: 8px;
+        padding: 16px;
+    }
+    
+    .feature-value {
+        font-size: 2.5rem;
+        font-weight: 700;
+        margin-bottom: 4px;
+    }
+    
+    .feature-label {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        color: var(--spotify-off-white);
+        margin-bottom: 16px;
+    }
+    
+    .feature-progress {
+        margin-bottom: 16px;
+    }
+    
+    .feature-description {
+        font-size: 0.9rem;
+        color: var(--spotify-off-white);
+    }
+    
+    @media (max-width: 768px) {
+        .track-details-section {
+            flex-direction: column;
+        }
+        
+        .track-image-container,
+        .track-info-container {
+            flex: 1 0 100%;
+        }
+        
+        .track-title {
+            font-size: 1.8rem;
+        }
+        
+        .track-actions {
+            flex-wrap: wrap;
+        }
+        
+        .audio-features {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
 @endpush
