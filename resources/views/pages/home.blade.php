@@ -4,7 +4,6 @@
 
 @section('content')
 {{-- Cette page a été modifiée pour utiliser vos images spécifiques --}}
-<div class="main-content">
     <!-- Barre de recherche tout en haut centrée -->
     <div class="top-search-container">
         <div class="search-buttons">
@@ -18,8 +17,13 @@
                 <input type="text" class="search-input" name="q" placeholder="Que souhaitez-vous écouter ?">
             </div>
         </form>
+        <a href="{{ route('profile') }}" class="profile-link">
+                <div class="profile-icon">
+                    <i class="fas fa-user"></i>
+                </div>
+            </a>
     </div>
-    
+<div class="main-content">    
     <!-- En-tête avec informations utilisateur -->
     <div class="user-welcome">
         <div class="user-header">
@@ -27,11 +31,6 @@
                 <div class="user-avatar">{{ substr($userProgress->getUsername(), 0, 1) }}</div>
                 <h1 class="welcome-title">Bonjour {{ $userProgress->getUsername() }}</h1>
             </div>
-            <a href="{{ route('profile') }}" class="profile-link">
-                <div class="profile-icon">
-                    <i class="fas fa-user"></i>
-                </div>
-            </a>
         </div>
         
         <div class="progress-section-left">
@@ -205,13 +204,10 @@
         align-items: center;
         margin-bottom: 30px;
         position: relative;
-        padding: 5px 0;
-        justify-content: center;
+        justify-content: space-between;
     }
     
     .search-buttons {
-        position: absolute;
-        left: 0;
         display: flex;
         align-items: center;
     }
@@ -243,6 +239,7 @@
         position: absolute;
         left: 15px;
         top: 50%;
+        z-index: 10;
         transform: translateY(-50%);
         color: var(--spotify-off-white);
         font-size: 16px;
