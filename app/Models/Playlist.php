@@ -11,6 +11,7 @@ class Playlist
     private $image_url;
     private $tracks_count;
     private $tracks;
+    private $covers;
 
     public function __construct(
         string $id,
@@ -19,6 +20,7 @@ class Playlist
         string $owner,
         ?string $image_url = null,
         int $tracks_count = 0,
+        ?array $covers = null,
         ?array $tracks = null
     ) {
         $this->id = $id;
@@ -28,6 +30,7 @@ class Playlist
         $this->image_url = $image_url;
         $this->tracks_count = $tracks_count;
         $this->tracks = $tracks;
+        $this->covers = $covers ?? [$image_url]; // Si pas de covers spécifiques, utiliser l'image principale
     }
 
     public function getId()
@@ -63,6 +66,11 @@ class Playlist
     public function getTracks()
     {
         return $this->tracks;
+    }
+
+    public function getCovers()
+    {
+        return $this->covers;
     }
 
     public function getFormattedDuration()

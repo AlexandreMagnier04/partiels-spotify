@@ -7,43 +7,191 @@ use App\Models\Album;
 use App\Models\Artist;
 use App\Models\Playlist;
 use App\Models\TrackDetails;
+use App\Models\UserProgress;
 use Carbon\Carbon;
+use Illuminate\Http\Request;
 
 class SpotifyController extends Controller
 {
     private $client;
     private $api_token;
+    private $client_id;
+    private $client_secret;
+    private $user_progress;
 
     public function __construct()
     {
         $this->client = new \GuzzleHttp\Client();
-        // Dans un projet réel, ce token serait récupéré via l'autorisation OAuth
-        // et stocké de manière sécurisée, pas en dur dans le code
-        $this->api_token = 'VOTRE_TOKEN_SPOTIFY_API';
+        $this->client_id = '95e10ffab7914e01905037fad9a2cb4e';
+        $this->client_secret = 'b4d93711efc643c5a092ece5e32e4598';
+        // Obtenir un token d'accès
+        $this->api_token = $this->getSpotifyToken();
+        
+        // Initialiser le progrès de l'utilisateur (dans un vrai projet, cela viendrait de la base de données)
+        $this->user_progress = new UserProgress(
+            'current_user',
+            'Hugo',
+            22000, // Points actuels
+            100000, // Points maximum pour le niveau actuel
+            16, // Niveau actuel
+            [
+                'listening_hours' => 150,
+                'playlists_created' => 12,
+                'exclusive_listens' => 5,
+                'artist_interactions' => 20,
+                'events_participated' => 2
+            ],
+            [
+                ['level' => 5, 'reward' => 'Premium 1 mois offert', 'unlocked' => true],
+                ['level' => 10, 'reward' => 'Accès anticipé aux sorties', 'unlocked' => true],
+                ['level' => 15, 'reward' => 'Places pour concert exclusif', 'unlocked' => true],
+                ['level' => 20, 'reward' => 'Rencontre avec artiste', 'unlocked' => false],
+                ['level' => 25, 'reward' => 'Merchandising édition limitée', 'unlocked' => false]
+            ]
+        );
     }
 
     /**
-     * Affiche la page d'accueil avec les nouveautés et recommandations
+     * Obtient un token d'accès Spotify
+     */
+    private function getSpotifyToken()
+    {
+        try {
+            $response = $this->client->request('POST', 'https://accounts.spotify.com/api/token', [
+                'form_params' => [
+                    'grant_type' => 'client_credentials'
+                ],
+                'headers' => [
+                    'Authorization' => 'Basic ' . base64_encode($this->client_id . ':' . $this->client_secret),
+                    'Content-Type' => 'application/x-www-form-urlencoded'
+                ]
+            ]);
+            
+            $result = json_decode($response->getBody());
+            return $result->access_token;
+        } catch (\Exception $e) {
+            error_log('Erreur lors de l\'obtention du token Spotify: ' . $e->getMessage());
+            return '';
+        }
+    }
+
+    /**
+     * Affiche la page d'accueil avec le nouveau design à 2 colonnes
      */
     public function index()
     {
-        // Récupérer les nouveautés
-        $newReleases = $this->getNewReleases();
-        
-        // Récupérer les playlists mises en avant
-        $featuredPlaylists = $this->getFeaturedPlaylists();
-        
-        // Dans un cas réel, nous utiliserions le token de l'utilisateur pour accéder à ses données
-        // Pour cette démo, nous utilisons des données simulées pour les éléments personnalisés
-        $recentlyPlayed = $this->simulateRecentlyPlayed();
-        $recommendations = $this->simulateRecommendations();
+        try {
+            // Récupérer les playlists de l'utilisateur
+            $userPlaylists = $this->getUserPlaylists();
+            
+            // Récupérer les favoris de l'utilisateur
+            $userFavorites = $this->getUserFavorites();
+            
+            // Récupérer les nouveautés
+            $newReleases = $this->getNewReleases();
+            
+            // Récupérer les playlists mises en avant
+            $featuredPlaylists = $this->getFeaturedPlaylists();
+            
+            return view('pages.home', [
+                'userPlaylists' => $userPlaylists,
+                'userFavorites' => $userFavorites,
+                'newReleases' => $newReleases,
+                'featuredPlaylists' => $featuredPlaylists,
+                'userProgress' => $this->user_progress
+            ]);
+        } catch (\Exception $e) {
+            error_log('Erreur page accueil: ' . $e->getMessage());
+            return view('pages.error', ['message' => 'Une erreur est survenue lors du chargement de la page d\'accueil.']);
+        }
+    }
 
-        return view('pages.home', [
-            'newReleases' => $newReleases,
-            'featuredPlaylists' => $featuredPlaylists,
-            'recentlyPlayed' => $recentlyPlayed,
-            'recommendations' => $recommendations
+    /**
+     * Affiche la page de progression SPOT'VIP
+     */
+    public function progression()
+    {
+        return view('pages.progression', [
+            'userProgress' => $this->user_progress
         ]);
+    }
+
+    /**
+     * Affiche la page de profil utilisateur avec le nouveau design
+     */
+    public function profile()
+    {
+        return view('pages.profile', [
+            'userProgress' => $this->user_progress,
+            'userPlaylists' => $this->getUserPlaylists(4) // Limite à 4 playlists
+        ]);
+    }
+
+    /**
+     * Récupère les playlists de l'utilisateur
+     */
+    private function getUserPlaylists($limit = 4)
+    {
+        // Dans une application réelle, on récupérerait les playlists de l'utilisateur via l'API
+        // Mais pour cette démo, on va utiliser des données statiques similaires à l'écran 1
+        $playlists = [];
+        
+        // Images pour les playlists en fonction du design de la deuxième capture d'écran
+        $images = [
+            '/img/covers/playlist-1.jpg',
+            '/img/covers/playlist-2.jpg',
+            '/img/covers/playlist-3.jpg',
+            '/img/covers/playlist-4.jpg'
+        ];
+        
+        for ($i = 1; $i <= $limit; $i++) {
+            $playlists[] = new Playlist(
+                'playlist-' . $i,
+                'Playlist ' . $i,
+                'Ma playlist numéro ' . $i,
+                'Hugo',
+                $images[$i-1],
+                mt_rand(10, 100)
+            );
+        }
+        
+        return $playlists;
+    }
+
+    /**
+     * Récupère les favoris de l'utilisateur
+     */
+    private function getUserFavorites()
+    {
+        // Pour la démo, on utilise des données statiques
+        $favorites = [];
+        
+        // Images similaires à la capture d'écran 2
+        $images = [
+            '/img/covers/album1.jpg',
+            '/img/covers/album2.jpg',
+            '/img/covers/album3.jpg',
+            '/img/covers/album4.jpg'
+        ];
+        
+        $genres = ['Rap', 'Pop', 'Hip-hop', 'Électronique'];
+        
+        foreach ($images as $index => $image) {
+            $favorites[] = new Album(
+                'favorite-' . ($index + 1),
+                'Album ' . ($index + 1),
+                'Artiste ' . ($index + 1),
+                'artist-' . ($index + 1),
+                Carbon::now()->subDays(mt_rand(1, 365))->locale('fr')->translatedFormat('d F Y'),
+                mt_rand(8, 16),
+                $image,
+                null,
+                mt_rand(60, 90),
+                [$genres[$index]]
+            );
+        }
+        
+        return $favorites;
     }
 
     /**
@@ -80,10 +228,30 @@ class SpotifyController extends Controller
             
             return $newReleases;
         } catch (\Exception $e) {
-            // En cas d'erreur, retourner un tableau vide et loguer l'erreur
-            // Dans un vrai projet, gérer cette erreur de manière plus élégante
             error_log('Erreur API Spotify (getNewReleases): ' . $e->getMessage());
-            return $this->simulateNewReleases();
+            
+            // En cas d'erreur, utiliser des données de substitution
+            $data = [
+                ['id' => 'album1', 'name' => 'New Release 1', 'artist' => 'Artist 1', 'image' => '/img/covers/album1.jpg'],
+                ['id' => 'album2', 'name' => 'New Release 2', 'artist' => 'Artist 2', 'image' => '/img/covers/album2.jpg'],
+                ['id' => 'album3', 'name' => 'New Release 3', 'artist' => 'Artist 3', 'image' => '/img/covers/album3.jpg'],
+                ['id' => 'album4', 'name' => 'New Release 4', 'artist' => 'Artist 4', 'image' => '/img/covers/album4.jpg']
+            ];
+            
+            $newReleases = [];
+            foreach ($data as $album) {
+                $newReleases[] = new Album(
+                    $album['id'],
+                    $album['name'],
+                    $album['artist'],
+                    'artist-id-' . rand(1, 1000),
+                    Carbon::now()->subDays(rand(1, 30))->locale('fr')->translatedFormat('d F Y'),
+                    rand(8, 16),
+                    $album['image']
+                );
+            }
+            
+            return $newReleases;
         }
     }
 
@@ -117,9 +285,29 @@ class SpotifyController extends Controller
             
             return $featuredPlaylists;
         } catch (\Exception $e) {
-            // En cas d'erreur, retourner un tableau vide et loguer l'erreur
             error_log('Erreur API Spotify (getFeaturedPlaylists): ' . $e->getMessage());
-            return $this->simulateFeaturedPlaylists();
+            
+            // En cas d'erreur, utiliser des données de substitution
+            $data = [
+                ['id' => 'playlist1', 'name' => 'Featured Playlist 1', 'image' => '/img/covers/playlist-1.jpg'],
+                ['id' => 'playlist2', 'name' => 'Featured Playlist 2', 'image' => '/img/covers/playlist-2.jpg'],
+                ['id' => 'playlist3', 'name' => 'Featured Playlist 3', 'image' => '/img/covers/playlist-3.jpg'],
+                ['id' => 'playlist4', 'name' => 'Featured Playlist 4', 'image' => '/img/covers/playlist-4.jpg']
+            ];
+            
+            $featuredPlaylists = [];
+            foreach ($data as $playlist) {
+                $featuredPlaylists[] = new Playlist(
+                    $playlist['id'],
+                    $playlist['name'],
+                    'Playlist mise en avant selon vos goûts',
+                    'Spotify',
+                    $playlist['image'],
+                    rand(20, 50)
+                );
+            }
+            
+            return $featuredPlaylists;
         }
     }
 
@@ -190,15 +378,16 @@ class SpotifyController extends Controller
                 $objTrack->album->images[0]->url
             );
             
+            // Ajouter des SPOINTS pour l'écoute (dans un cas réel, vérifier si c'est la première écoute)
+            $this->user_progress->addPoints(10, 'Écoute de titre');
+            
             return view('pages.track-details', [
                 'trackDetails' => $trackDetails,
+                'userProgress' => $this->user_progress
             ]);
         } catch (\Exception $e) {
-            // En cas d'erreur, simuler des données
             error_log('Erreur API Spotify (trackDetails): ' . $e->getMessage());
-            return view('pages.track-details', [
-                'trackDetails' => $this->simulateTrackDetails($id),
-            ]);
+            return view('pages.error', ['message' => 'Impossible de charger les détails de ce titre.']);
         }
     }
     
@@ -255,23 +444,25 @@ class SpotifyController extends Controller
                 $objAlbum->copyrights[0]->text ?? ''
             );
             
+            // Ajouter des SPOINTS pour la consultation d'album
+            $this->user_progress->addPoints(25, 'Consultation d\'album');
+            
             return view('pages.album-details', [
                 'albumDetails' => $albumDetails,
+                'userProgress' => $this->user_progress
             ]);
         } catch (\Exception $e) {
-            // En cas d'erreur, simuler des données
             error_log('Erreur API Spotify (albumDetails): ' . $e->getMessage());
-            return view('pages.album-details', [
-                'albumDetails' => $this->simulateAlbumDetails($id),
-            ]);
+            return view('pages.error', ['message' => 'Impossible de charger les détails de cet album.']);
         }
     }
 
     /**
      * Recherche dans Spotify
      */
-    public function search(string $query = null)
+    public function search(Request $request)
     {
+        $query = $request->input('q', '');
         $results = [];
         
         if ($query) {
@@ -298,17 +489,20 @@ class SpotifyController extends Controller
                     'artists' => $this->transformArtists($objResults->artists->items ?? []),
                     'playlists' => $this->transformPlaylists($objResults->playlists->items ?? [])
                 ];
+                
+                // Ajouter des SPOINTS pour la recherche
+                $this->user_progress->addPoints(5, 'Recherche effectuée');
             } catch (\Exception $e) {
-                // En cas d'erreur, simuler des résultats
                 error_log('Erreur API Spotify (search): ' . $e->getMessage());
-                $results = $this->simulateSearchResults($query);
+                $results = [];
             }
         }
         
         return view('pages.search', [
             'query' => $query,
             'results' => $results,
-            'genres' => $this->getGenresList()
+            'genres' => $this->getGenresList(),
+            'userProgress' => $this->user_progress
         ]);
     }
     
@@ -396,166 +590,92 @@ class SpotifyController extends Controller
     }
 
     /**
-     * Récupération des genres (simulée car l'API renvoie une liste limitée)
+     * Récupération des genres
      */
     private function getGenresList()
     {
-        return [
-            'Pop', 'Rock', 'Hip-Hop', 'R&B', 'Electronic', 'Dance', 
-            'Jazz', 'Classical', 'Country', 'Folk', 'Metal', 'Punk', 
-            'Indie', 'Alternative', 'Reggae', 'Blues', 'Soul'
-        ];
+        try {
+            $response = $this->client->request('GET', 'https://api.spotify.com/v1/recommendations/available-genre-seeds', [
+                'headers' => [
+                    'Authorization' => 'Bearer ' . $this->api_token,
+                    'Accept' => 'application/json',
+                ]
+            ]);
+            
+            $res = $response->getBody();
+            $genres = json_decode($res)->genres;
+            return $genres;
+        } catch (\Exception $e) {
+            error_log('Erreur récupération genres: ' . $e->getMessage());
+            return [
+                'Pop', 'Rock', 'Hip-Hop', 'R&B', 'Electronic', 'Dance', 
+                'Jazz', 'Classical', 'Country', 'Folk', 'Metal', 'Punk', 
+                'Indie', 'Alternative', 'Reggae', 'Blues', 'Soul'
+            ];
+        }
     }
 
     /**
-     * Afficher la bibliothèque (simulée)
+     * Ajouter des points SPOT'VIP
+     */
+    public function addPoints(Request $request)
+    {
+        $action = $request->input('action');
+        $points = $request->input('points', 0);
+        
+        $this->user_progress->addPoints($points, $action);
+        
+        return redirect()->back()->with('message', "Vous avez gagné $points SPOINTS pour l'action : $action");
+    }
+    
+    /**
+     * Simuler des actions pour gagner des points (pour la démonstration)
+     */
+    public function simulateAction(Request $request, $action)
+    {
+        $points = 0;
+        $actionLabel = '';
+        
+        switch ($action) {
+            case 'listen':
+                $points = 10;
+                $actionLabel = 'Écoute de musique (1 heure)';
+                break;
+            case 'playlist':
+                $points = 50;
+                $actionLabel = 'Création et partage d\'une playlist';
+                break;
+            case 'preview':
+                $points = 100;
+                $actionLabel = 'Écoute d\'un album en avant-première';
+                break;
+            case 'event':
+                $points = 200;
+                $actionLabel = 'Participation à un événement Spotify';
+                break;
+            case 'interaction':
+                $points = 25;
+                $actionLabel = 'Interaction avec un artiste';
+                break;
+            default:
+                $points = 5;
+                $actionLabel = 'Action générique';
+        }
+        
+        $this->user_progress->addPoints($points, $actionLabel);
+        
+        return redirect()->back()->with('success', "Vous avez gagné $points SPOINTS pour l'action : $actionLabel");
+    }
+    
+    /**
+     * Page de bibliothèque (simplifiée pour la démo)
      */
     public function library()
     {
-        // Dans un projet réel, récupérer les données depuis l'API
-        $playlists = $this->simulateUserPlaylists();
-        $savedAlbums = $this->simulateSavedAlbums();
-        $artists = $this->simulateFollowedArtists();
-        
         return view('pages.library', [
-            'playlists' => $playlists,
-            'savedAlbums' => $savedAlbums,
-            'artists' => $artists
+            'userPlaylists' => $this->getUserPlaylists(8),
+            'userFavorites' => $this->getUserFavorites(),
+            'userProgress' => $this->user_progress
         ]);
-    }
-
-    /**
-     * Méthodes de simulation de données en cas d'erreur API ou pour la démo
-     */
-    private function simulateNewReleases()
-    {
-        return [
-            new Album('album1', 'New Album Title 1', 'Popular Artist 1', 'artist1', '31 mars 2024', 12, '/img/covers/new-release-1.jpg'),
-            new Album('album2', 'New Album Title 2', 'Popular Artist 2', 'artist2', '25 mars 2024', 10, '/img/covers/new-release-2.jpg'),
-            new Album('album3', 'New Album Title 3', 'Popular Artist 3', 'artist3', '20 mars 2024', 15, '/img/covers/new-release-3.jpg'),
-            new Album('album4', 'New Album Title 4', 'Popular Artist 4', 'artist4', '15 mars 2024', 8, '/img/covers/new-release-4.jpg'),
-        ];
-    }
-
-    private function simulateFeaturedPlaylists()
-    {
-        return [
-            new Playlist('playlist1', 'Today\'s Top Hits', 'The most played tracks right now', 'Spotify', '/img/covers/todays-top-hits.jpg', 50),
-            new Playlist('playlist2', 'RapCaviar', 'Hip hop heavyweight playlist', 'Spotify', '/img/covers/rapcaviar.jpg', 50),
-            new Playlist('playlist3', 'Rock Classics', 'Rock legends & epic songs', 'Spotify', '/img/covers/rock-classics.jpg', 75),
-            new Playlist('playlist4', 'Chill Hits', 'Kick back with the chillest tracks', 'Spotify', '/img/covers/chill-hits.jpg', 100),
-            new Playlist('playlist5', 'Dance Party', 'Move to the rhythm', 'Spotify', '/img/covers/dance-party.jpg', 80),
-        ];
-    }
-
-    private function simulateRecentlyPlayed()
-    {
-        return [
-            new Track('track1', 'Blinding Lights', 'The Weeknd', 'artist1', 200000, 'preview-url', '/img/covers/after-hours.jpg', 'After Hours', 'album1'),
-            new Track('track2', 'Dance Monkey', 'Tones and I', 'artist2', 209000, 'preview-url', '/img/covers/kids-coming.jpg', 'The Kids Are Coming', 'album2'),
-            new Track('track3', 'Watermelon Sugar', 'Harry Styles', 'artist3', 174000, 'preview-url', '/img/covers/fine-line.jpg', 'Fine Line', 'album3'),
-            new Track('track4', 'Don\'t Start Now', 'Dua Lipa', 'artist4', 183000, 'preview-url', '/img/covers/future-nostalgia.jpg', 'Future Nostalgia', 'album4'),
-            new Track('track5', 'Circles', 'Post Malone', 'artist5', 215000, 'preview-url', '/img/covers/hollywood-bleeding.jpg', 'Hollywood\'s Bleeding', 'album5'),
-        ];
-    }
-
-    private function simulateRecommendations()
-    {
-        return [
-            new Playlist('playlist6', 'Discover Weekly', 'Your weekly mixtape of fresh music', 'Spotify', '/img/covers/discover-weekly.jpg', 30),
-            new Playlist('playlist7', 'Release Radar', 'New releases from artists you follow', 'Spotify', '/img/covers/release-radar.jpg', 30),
-            new Playlist('playlist8', 'Daily Mix 1', 'The Weeknd, Dua Lipa, Taylor Swift and more', 'Spotify', '/img/covers/daily-mix-1.jpg', 50),
-            new Playlist('playlist9', 'Daily Mix 2', 'Drake, Travis Scott, Kanye West and more', 'Spotify', '/img/covers/daily-mix-2.jpg', 50),
-        ];
-    }
-
-    private function simulateTrackDetails($id)
-    {
-        return new TrackDetails(
-            $id,
-            'Track Title for ID ' . $id,
-            ['Main Artist', 'Featured Artist'],
-            'Album Name',
-            'album-id',
-            '15 janvier 2024',
-            210000, // 3:30 en millisecondes
-            75, // popularité sur 100
-            0.8, // danceability
-            0.7, // energy
-            120, // tempo
-            5, // key (F#)
-            1, // mode (majeur)
-            'preview-url',
-            '/img/covers/track-cover.jpg'
-        );
-    }
-
-    private function simulateAlbumDetails($id)
-    {
-        $tracks = [
-            new Track('track-' . $id . '-1', 'Track 1', 'Artist Name', 'artist-id', 204000, 'preview-url'),
-            new Track('track-' . $id . '-2', 'Track 2', 'Artist Name', 'artist-id', 165000, 'preview-url'),
-            new Track('track-' . $id . '-3', 'Track 3', 'Artist Name', 'artist-id', 252000, 'preview-url'),
-        ];
-        
-        return new Album(
-            $id,
-            'Album Title for ID ' . $id,
-            'Album Artist',
-            'artist-id',
-            '10 mars 2024',
-            count($tracks),
-            '/img/covers/album-' . $id . '.jpg',
-            $tracks,
-            82,
-            ['Pop', 'R&B'],
-            'Record Label',
-            '© 2024 Record Label'
-        );
-    }
-
-    private function simulateUserPlaylists()
-    {
-        return [
-            new Playlist('user-playlist1', 'My Favorite Songs', 'All my favorite tracks', 'Current User', '/img/covers/my-playlist-1.jpg', 124),
-            new Playlist('user-playlist2', 'Workout Mix', 'Songs to keep me motivated', 'Current User', '/img/covers/my-playlist-2.jpg', 45),
-            new Playlist('user-playlist3', 'Chill Vibes', 'For relaxing times', 'Current User', '/img/covers/my-playlist-3.jpg', 87),
-        ];
-    }
-
-    private function simulateSavedAlbums()
-    {
-        return [
-            new Album('saved-album1', 'Album Name 1', 'Artist 1', 'artist1', '10 janvier 2023', 12, '/img/covers/saved-album-1.jpg'),
-            new Album('saved-album2', 'Album Name 2', 'Artist 2', 'artist2', '15 décembre 2022', 10, '/img/covers/saved-album-2.jpg'),
-        ];
-    }
-
-    private function simulateFollowedArtists()
-    {
-        return [
-            new Artist('artist1', 'Artist Name 1', 8500000, 90, ['Pop', 'R&B'], '/img/artists/artist-1.jpg'),
-            new Artist('artist2', 'Artist Name 2', 4200000, 85, ['Rock', 'Alternative'], '/img/artists/artist-2.jpg'),
-            new Artist('artist3', 'Artist Name 3', 2700000, 78, ['Hip-Hop', 'Rap'], '/img/artists/artist-3.jpg'),
-        ];
-    }
-
-    private function simulateSearchResults($query)
-    {
-        return [
-            'tracks' => [
-                new Track('track-search-1', 'Track with ' . $query, 'Artist Name', 'artist1', 195000, 'preview-url', '/img/covers/search-result-1.jpg', 'Album Name', 'album1'),
-                new Track('track-search-2', 'Another ' . $query . ' Song', 'Different Artist', 'artist2', 260000, 'preview-url', '/img/covers/search-result-2.jpg', 'Another Album', 'album2'),
-            ],
-            'artists' => [
-                new Artist('artist-search-1', $query . ' Artist', 5200000, 85, ['Pop', 'R&B'], '/img/artists/search-artist-1.jpg'),
-            ],
-            'albums' => [
-                new Album('album-search-1', 'The ' . $query . ' Album', 'Album Artist', 'artist3', '2023', 12, '/img/covers/search-album-1.jpg'),
-            ],
-            'playlists' => [
-                new Playlist('playlist-search-1', 'Best of ' . $query, 'Collection of best ' . $query . ' songs', 'Playlist Creator', '/img/covers/search-playlist-1.jpg', 50),
-            ],
-        ];
     }
 }

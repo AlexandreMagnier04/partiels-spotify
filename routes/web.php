@@ -9,32 +9,27 @@ use App\Http\Controllers\SpotifyController;
 |--------------------------------------------------------------------------
 */
 
-// Route principale - page d'accueil
+// Routes principales
 Route::get('/', [SpotifyController::class, 'index'])->name('home');
-
-// Recherche
 Route::get('/search', [SpotifyController::class, 'search'])->name('search');
-Route::get('/search/{query}', [SpotifyController::class, 'search'])->name('search.query');
-
-// Détails des pistes, albums, artistes
 Route::get('/track/{id}', [SpotifyController::class, 'trackDetails'])->name('trackDetails');
 Route::get('/album/{id}', [SpotifyController::class, 'albumDetails'])->name('albumDetails');
+Route::get('/profile', [SpotifyController::class, 'profile'])->name('profile');
+Route::get('/progression', [SpotifyController::class, 'progression'])->name('progression');
+
+// Routes pour le système SPOT'VIP
+Route::post('/add-points', [SpotifyController::class, 'addPoints'])->name('addPoints');
+
+// Routes pour simuler l'interaction avec l'API Spotify
+Route::get('/library', [SpotifyController::class, 'library'])->name('library');
 Route::get('/artist/{id}', [SpotifyController::class, 'artistDetails'])->name('artistDetails');
 Route::get('/playlist/{id}', [SpotifyController::class, 'playlistDetails'])->name('playlistDetails');
-
-// Bibliothèque de l'utilisateur
-Route::get('/library', [SpotifyController::class, 'library'])->name('library');
-
-// Routes pour les sections personnalisées
-Route::get('/made-for-you', [SpotifyController::class, 'madeForYou'])->name('madeForYou');
-Route::get('/recommendations', [SpotifyController::class, 'recommendations'])->name('recommendations');
+Route::get('/genre/{id}', [SpotifyController::class, 'genreDetails'])->name('genreDetails');
 Route::get('/new-releases', [SpotifyController::class, 'newReleases'])->name('newReleases');
 Route::get('/featured-playlists', [SpotifyController::class, 'featuredPlaylists'])->name('featuredPlaylists');
+Route::get('/made-for-you', [SpotifyController::class, 'madeForYou'])->name('madeForYou');
 
-// Routes pour simuler l'API Spotify (utilisées en AJAX)
-Route::prefix('api')->group(function () {
-    Route::get('/play-track/{id}', [SpotifyController::class, 'apiPlayTrack'])->name('api.playTrack');
-    Route::get('/pause-track/{id}', [SpotifyController::class, 'apiPauseTrack'])->name('api.pauseTrack');
-    Route::get('/like-track/{id}', [SpotifyController::class, 'apiLikeTrack'])->name('api.likeTrack');
-    Route::get('/add-to-playlist/{trackId}/{playlistId}', [SpotifyController::class, 'apiAddToPlaylist'])->name('api.addToPlaylist');
+// Fallback pour les routes non définies
+Route::fallback(function () {
+    return view('pages.error', ['message' => 'Cette page n\'existe pas.']);
 });
