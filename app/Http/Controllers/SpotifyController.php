@@ -83,10 +83,7 @@ class SpotifyController extends Controller
             $suggestedAlbums = $this->getSuggestedAlbums();
             
             return view('pages.home', [
-                'userPlaylists' => $userPlaylists,
-                'userFavorites' => $userFavorites,
-                'newReleases' => $newReleases,
-                'featuredPlaylists' => $featuredPlaylists,
+
                 'userProgress' => $this->user_progress,
                 'suggestedAlbums' => $suggestedAlbums
             ]);

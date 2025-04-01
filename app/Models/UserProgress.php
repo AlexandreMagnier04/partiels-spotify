@@ -302,6 +302,12 @@ class UserProgress
     {
         return $this->tiers;
     }
+
+    public function getSpointsToNextLevel()
+    {
+        $temp = $this->current_points + (($this->level - 1) * $this->max_points);
+        return (1000 - ($temp % 1000));
+    }
     
     /**
      * Retourne la couleur associée au niveau actuel
