@@ -16,12 +16,12 @@ Route::get('/track/{id}', [SpotifyController::class, 'trackDetails'])->name('tra
 Route::get('/album/{id}', [SpotifyController::class, 'albumDetails'])->name('albumDetails');
 Route::get('/profile', [SpotifyController::class, 'profile'])->name('profile');
 Route::get('/progression', [SpotifyController::class, 'progression'])->name('progression');
+Route::get('/library', [SpotifyController::class, 'library'])->name('library');
 
 // Routes pour le système SPOT'VIP
 Route::post('/add-points', [SpotifyController::class, 'addPoints'])->name('addPoints');
 
 // Routes pour simuler l'interaction avec l'API Spotify
-Route::get('/library', [SpotifyController::class, 'library'])->name('library');
 Route::get('/artist/{id}', [SpotifyController::class, 'artistDetails'])->name('artistDetails');
 Route::get('/playlist/{id}', [SpotifyController::class, 'playlistDetails'])->name('playlistDetails');
 Route::get('/genre/{id}', [SpotifyController::class, 'genreDetails'])->name('genreDetails');
