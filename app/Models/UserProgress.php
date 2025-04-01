@@ -19,19 +19,18 @@ class UserProgress
         'Platine' => '#e5e4e2'
     ];
     
-    // Définition des paliers selon la stratégie marketing
     private $tiers = [
         'Bronze' => [
-            'min_xp' => 0,
-            'max_xp' => 200,
+            'min_xp' => 5000,
+            'max_xp' => 10000,
             'rewards' => [
                 'Badges de profil personnalisés',
                 'Sons d\'introduction exclusifs'
             ]
         ],
         'Argent' => [
-            'min_xp' => 201,
-            'max_xp' => 600,
+            'min_xp' => 10001,
+            'max_xp' => 15000,
             'rewards' => [
                 'Accès anticipé à des concerts en streaming',
                 'Partage de contenu exclusif',
@@ -40,8 +39,8 @@ class UserProgress
             ]
         ],
         'Or' => [
-            'min_xp' => 601,
-            'max_xp' => 1000,
+            'min_xp' => 15001,
+            'max_xp' => 20000,
             'rewards' => [
                 'Accès à des sessions Q&A avec des artistes',
                 'Accès à des préventes de billets pour concerts',
@@ -50,8 +49,8 @@ class UserProgress
             ]
         ],
         'Platine' => [
-            'min_xp' => 1001,
-            'max_xp' => 5000,
+            'min_xp' => 20001,
+            'max_xp' => 25000,
             'rewards' => [
                 '1 mois d\'abonnement Premium gratuit',
                 'Rencontres en ligne avec des artistes',
@@ -307,9 +306,8 @@ class UserProgress
     /**
      * Retourne la couleur associée au niveau actuel
      */
-    public function getTierColor()
+    public function getTierColor(string $tier)
     {
-        $tier = $this->getCurrentTier();
         return $this->tier_colors[$tier] ?? '#1DB954'; // Couleur Spotify par défaut
     }
 }

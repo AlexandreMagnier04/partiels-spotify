@@ -837,8 +837,8 @@ a:hover {
 :root {
     --tier-bronze: #cd7f32;
     --tier-silver: #C0C0C0;
-    --tier-gold: #FFD700;
-    --tier-platinum: #e5e4e2;
+    --tier-gold: #ffd000c8;
+    --tier-platinum: #e5fcfa;
 }
 
 /* Progression entre paliers */
@@ -881,7 +881,7 @@ a:hover {
 }
 
 .next-tier {
-    background-color: rgba(255, 255, 255, 0.1);
+    background-color: rgba(255, 255, 255, 0.596);
     color: var(--spotify-white);
 }
 
@@ -936,11 +936,6 @@ a:hover {
 .current-tier-rewards:hover, .next-tier-rewards:hover {
     box-shadow: 0 6px 18px rgba(0, 0, 0, 0.3);
     transform: translateY(-2px);
-}
-
-.next-tier-rewards {
-    opacity: 0.8;
-    background-color: var(--spotify-medium-gray);
 }
 
 .next-tier-info {
@@ -1175,7 +1170,6 @@ a:hover {
 
 /* Style spécifique pour le niveau 16 (Or) */
 .or-tier .current-tier {
-    background-color: var(--spotify-green) !important;
     color: white !important;
 }
 

@@ -61,13 +61,10 @@ class User extends Authenticatable
      */
     public function getProgressData()
     {
-        // Ces données sont à titre d'exemple pour un utilisateur niveau 16 avec ~600 XP
-        // Dans un système réel, ces données seraient probablement récupérées depuis la base de données
-        
         $rewards = [
-            ['level' => 5, 'reward' => 'Premium 1 mois offert', 'unlocked' => true],
-            ['level' => 10, 'reward' => 'Accès anticipé aux sorties', 'unlocked' => true],
-            ['level' => 15, 'reward' => 'Places pour concert exclusif', 'unlocked' => true],
+            ['level' => 5, 'reward' => 'Thèmes et couleurs de l’interface ', 'unlocked' => true],
+            ['level' => 10, 'reward' => 'Places pour concert exclusif', 'unlocked' => true],
+            ['level' => 15, 'reward' => 'Premium 1 mois offert', 'unlocked' => true],
             ['level' => 20, 'reward' => 'Rencontre avec artiste', 'unlocked' => false],
             ['level' => 25, 'reward' => 'Merchandising édition limitée', 'unlocked' => false],
         ];
@@ -110,7 +107,7 @@ class User extends Authenticatable
         //   le total est de 15000 + 600 = 15600 XP
         
         $level = 16;
-        $currentPoints = 800; // Points dans le niveau actuel
+        $currentPoints = 700; // Points dans le niveau actuel
         $maxPoints = 1000;    // Points nécessaires pour passer au niveau suivant
         
         return new UserProgress(

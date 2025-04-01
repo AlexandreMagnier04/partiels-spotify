@@ -12,16 +12,12 @@
         </p>
     </div>
 
-    <div class="total-points-display">
-        Points totaux: <span class="total-points-value">{{ number_format($userProgress->getTotalPoints()) }} SPOINTS</span>
-    </div>
-
     <div class="level-info">
         <div class="big-level-badge">{{ $userProgress->getLevel() }}</div>
         <div class="level-details">
             <h2 class="current-level">Niveau {{ $userProgress->getLevel() }} - Palier {{ $userProgress->getCurrentTier() }}</h2>
             <p class="points-info">
-                {{ $userProgress->getCurrentPoints() }} / {{ $userProgress->getMaxPoints() }} SPOINTS 
+                {{ $userProgress->getTotalPoints() }} / {{ $userProgress->getPointsForLevel($userProgress->getLevel()) }} SPOINTS 
                 pour atteindre le niveau {{ $userProgress->getLevel() + 1 }}
             </p>
             <div class="spotvip-progress">
@@ -37,7 +33,9 @@
             <div class="tier-info">
                 <div class="current-tier">{{ $userProgress->getCurrentTier() }}</div>
                 <span class="tier-arrow">→</span>
-                <div class="next-tier">{{ $userProgress->getNextTier() }}</div>
+                <div class="next-tier" style="background-color: rgba{{ str_replace('#', '(', $userProgress->getTierColor($userProgress->getNextTier())) }}, 0.6);">
+                    {{ $userProgress->getNextTier() }}
+                </div>
                 <span class="tier-points">{{ number_format($userProgress->getPointsToNextTier()) }} SPOINTS restants</span>
             </div>
             <div class="tier-progress-bar">
@@ -52,7 +50,7 @@
         <div class="tier-rewards-list">
             @foreach($userProgress->getCurrentTierRewards() as $reward)
                 <div class="tier-reward-item">
-                    <div class="tier-reward-icon" style="background-color: rgba{{ str_replace('#', '(', $userProgress->getTierColor()) }}, 0.2);">
+                    <div class="tier-reward-icon" style="background-color: rgba{{ str_replace('#', '(', $userProgress->getTierColor($userProgress->getCurrentTier())) }}, 0.2);">
                         <i class="fas fa-gift"></i>
                     </div>
                     <div class="tier-reward-name">{{ $reward }}</div>
@@ -102,7 +100,9 @@
                         $pointsNeeded = max(0, $pointsNeeded);
                     @endphp
                     <div class="reward-item {{ !$reward['unlocked'] ? 'locked' : '' }}">
-                        <div class="reward-level {{ $status }}" style="color: var(--spotify-green); {{ $reward['unlocked'] ? 'background-color: '.$userProgress->getTierColor().';' : '' }}">{{ $reward['level'] }}</div>
+                        <div class="reward-level {{ $status }}" style="color: var(--spotify-black); {{ $reward['unlocked'] ? 'background-color: '.$userProgress->getTierColor($userProgress->getCurrentTier()).';' : '' }}">
+                            {{ $reward['level'] }}
+                        </div>
                         <div>
                             <div class="reward-name">{{ $reward['reward'] }}</div>
                             @if(!$reward['unlocked'])
@@ -160,7 +160,7 @@
                 </div>
                 <div class="earning-info">
                     <div class="earning-action">Interagir avec les artistes</div>
-                    <div class="earning-points">+25 à +50 SPOINTS par interaction</div>
+                    <div class="earning-points">+25 à +75 SPOINTS par interaction</div>
                 </div>
             </div>
         </div>
@@ -252,27 +252,5 @@
         transition: width 0.3s ease;
     }
 
-    
-    /* Responsive */
-    @media (max-width: 768px) {
-        .tier-rewards-list {
-            grid-template-columns: 1fr;
-        }
-        
-        .tier-info {
-            flex-direction: column;
-            align-items: flex-start;
-        }
-        
-        .tier-arrow {
-            transform: rotate(90deg);
-            margin: 12px 0;
-        }
-        
-        .tier-points {
-            margin-left: 0;
-            margin-top: 8px;
-        }
-    }
 </style>
 @endpush
