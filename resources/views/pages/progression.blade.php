@@ -3,19 +3,23 @@
 @section('title', 'Progression SPOT\'VIP')
 
 @section('content')
-<div class="progression-page">
+<div class="progression-page {{ strtolower($userProgress->getCurrentTier()) }}-tier">
     <div class="progression-header">
         <h1 class="progression-title">SPOT'VIP</h1>
         <p class="progression-subtitle">
             Gagnez des SPOINTS en écoutant de la musique, en créant des playlists et en interagissant avec les artistes. 
-            Débloquez des récompenses exclusives en atteignant de nouveaux niveaux !
+            Débloquez des récompenses exclusives en atteignant de nouveaux paliers !
         </p>
+    </div>
+
+    <div class="total-points-display">
+        Points totaux: <span class="total-points-value">{{ number_format($userProgress->getTotalPoints()) }} SPOINTS</span>
     </div>
 
     <div class="level-info">
         <div class="big-level-badge">{{ $userProgress->getLevel() }}</div>
         <div class="level-details">
-            <h2 class="current-level">Niveau {{ $userProgress->getLevel() }}</h2>
+            <h2 class="current-level">Niveau {{ $userProgress->getLevel() }} - Palier {{ $userProgress->getCurrentTier() }}</h2>
             <p class="points-info">
                 {{ $userProgress->getCurrentPoints() }} / {{ $userProgress->getMaxPoints() }} SPOINTS 
                 pour atteindre le niveau {{ $userProgress->getLevel() + 1 }}
@@ -25,11 +29,63 @@
             </div>
         </div>
     </div>
+    
+    <!-- Progression entre paliers -->
+    <div class="tier-progression">
+        <h2 class="tier-title">Progression vers le prochain palier</h2>
+        <div class="tier-details">
+            <div class="tier-info">
+                <div class="current-tier">{{ $userProgress->getCurrentTier() }}</div>
+                <span class="tier-arrow">→</span>
+                <div class="next-tier">{{ $userProgress->getNextTier() }}</div>
+                <span class="tier-points">{{ number_format($userProgress->getPointsToNextTier()) }} SPOINTS restants</span>
+            </div>
+            <div class="tier-progress-bar">
+                <div class="tier-progress-fill" style="width: {{ $userProgress->getTierProgressPercentage() }}%;"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Avantages du palier actuel -->
+    <div class="current-tier-rewards">
+        <h2 class="rewards-title">Avantages de votre palier {{ $userProgress->getCurrentTier() }}</h2>
+        <div class="tier-rewards-list">
+            @foreach($userProgress->getCurrentTierRewards() as $reward)
+                <div class="tier-reward-item">
+                    <div class="tier-reward-icon" style="background-color: rgba{{ str_replace('#', '(', $userProgress->getTierColor()) }}, 0.2);">
+                        <i class="fas fa-gift"></i>
+                    </div>
+                    <div class="tier-reward-name">{{ $reward }}</div>
+                </div>
+            @endforeach
+        </div>
+    </div>
+    
+    <!-- Aperçu du prochain palier -->
+    @if($userProgress->getCurrentTier() !== $userProgress->getNextTier())
+    <div class="next-tier-rewards">
+        <h2 class="rewards-title">Prochain palier : {{ $userProgress->getNextTier() }}</h2>
+        <p class="next-tier-info">Débloquez ces avantages en atteignant {{ $userProgress->getPointsToNextTier() }} SPOINTS supplémentaires</p>
+        <div class="tier-rewards-list next">
+            @foreach($userProgress->getNextTierRewards() as $reward)
+                <div class="tier-reward-item locked">
+                    <div class="tier-reward-icon">
+                        <i class="fas fa-lock"></i>
+                    </div>
+                    <div class="tier-reward-name">{{ $reward }}</div>
+                </div>
+            @endforeach
+        </div>
+    </div>
+    @endif
 
     <div class="spotvip-rewards">
-        <h2 class="rewards-title">Récompenses à débloquer</h2>
+        <h2 class="rewards-title">Récompenses des niveaux</h2>
         <div class="rewards-timeline">
             <div class="timeline-line"></div>
+            <div class="rewards-progress-bar">
+                <div class="rewards-progress-fill" style="width: {{ $userProgress->getRewardsProgressPercentage() }}%;"></div>
+            </div>
             <div class="rewards-list">
                 @foreach($userProgress->getRewards() as $reward)
                     @php
@@ -42,14 +98,15 @@
                             $status = 'locked';
                         }
                         
-                        $pointsNeeded = $userProgress->getPointsForLevel($reward['level']);
+                        $pointsNeeded = $userProgress->getPointsForLevel($reward['level']) - $userProgress->getTotalPoints();
+                        $pointsNeeded = max(0, $pointsNeeded);
                     @endphp
                     <div class="reward-item {{ !$reward['unlocked'] ? 'locked' : '' }}">
-                        <div class="reward-level {{ $status }}">{{ $reward['level'] }}</div>
+                        <div class="reward-level {{ $status }}" style="color: var(--spotify-green); {{ $reward['unlocked'] ? 'background-color: '.$userProgress->getTierColor().';' : '' }}">{{ $reward['level'] }}</div>
                         <div>
                             <div class="reward-name">{{ $reward['reward'] }}</div>
                             @if(!$reward['unlocked'])
-                                <div class="reward-points">{{ $pointsNeeded }} SPOINTS restants</div>
+                                <div class="reward-points">{{ number_format($pointsNeeded) }} SPOINTS restants</div>
                             @endif
                         </div>
                     </div>
@@ -128,6 +185,7 @@
 </div>
 @endsection
 
+
 @push('styles')
 <style>
     .activity-history {
@@ -173,6 +231,48 @@
         padding: 30px;
         background-color: var(--spotify-dark-gray);
         border-radius: 8px;
+    }
+    
+    /* Styles pour la barre de progression des récompenses */
+    .rewards-progress-bar {
+        position: absolute;
+        top: 24px;
+        left: 0;
+        width: 100%;
+        height: 4px;
+        background-color: rgba(255, 255, 255, 0.2);
+        z-index: 1;
+        overflow: hidden;
+    }
+    
+    .rewards-progress-fill {
+        height: 100%;
+        background-color: var(--spotify-green);
+        z-index: 2;
+        transition: width 0.3s ease;
+    }
+
+    
+    /* Responsive */
+    @media (max-width: 768px) {
+        .tier-rewards-list {
+            grid-template-columns: 1fr;
+        }
+        
+        .tier-info {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+        
+        .tier-arrow {
+            transform: rotate(90deg);
+            margin: 12px 0;
+        }
+        
+        .tier-points {
+            margin-left: 0;
+            margin-top: 8px;
+        }
     }
 </style>
 @endpush

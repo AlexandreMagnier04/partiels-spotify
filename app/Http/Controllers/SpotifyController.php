@@ -8,8 +8,10 @@ use App\Models\Artist;
 use App\Models\Playlist;
 use App\Models\TrackDetails;
 use App\Models\UserProgress;
+use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class SpotifyController extends Controller
 {
@@ -28,27 +30,23 @@ class SpotifyController extends Controller
         $this->api_token = $this->getSpotifyToken();
         
         // Initialiser le progrès de l'utilisateur (dans un vrai projet, cela viendrait de la base de données)
-        $this->user_progress = new UserProgress(
-            'current_user',
-            'Hugo',
-            22000, // Points actuels
-            100000, // Points maximum pour le niveau actuel
-            16, // Niveau actuel
-            [
-                'listening_hours' => 150,
-                'playlists_created' => 12,
-                'exclusive_listens' => 5,
-                'artist_interactions' => 20,
-                'events_participated' => 2
-            ],
-            [
-                ['level' => 5, 'reward' => 'Premium 1 mois offert', 'unlocked' => true],
-                ['level' => 10, 'reward' => 'Accès anticipé aux sorties', 'unlocked' => true],
-                ['level' => 15, 'reward' => 'Places pour concert exclusif', 'unlocked' => true],
-                ['level' => 20, 'reward' => 'Rencontre avec artiste', 'unlocked' => false],
-                ['level' => 25, 'reward' => 'Merchandising édition limitée', 'unlocked' => false]
-            ]
-        );
+        $this->initUserProgress();
+    }
+
+    /**
+     * Initialiser les données de progression de l'utilisateur
+     */
+    private function initUserProgress()
+    {
+        // Dans un vrai projet, on récupérerait l'utilisateur connecté
+        // Ici on crée un utilisateur fictif de niveau 16 avec environ 600 XP
+        $user = new User();
+        $user->id = 1;
+        $user->name = 'Hugo';
+        $user->email = 'hugo@exemple.com';
+        
+        // Utiliser la méthode getProgressData de l'utilisateur
+        $this->user_progress = $user->getProgressData();
     }
 
     /**
@@ -379,7 +377,7 @@ class SpotifyController extends Controller
             );
             
             // Ajouter des SPOINTS pour l'écoute (dans un cas réel, vérifier si c'est la première écoute)
-            $this->user_progress->addPoints(10, 'Écoute de titre');
+            $this->user_progress->addPoints(1, 'Écoute de titre');
             
             return view('pages.track-details', [
                 'trackDetails' => $trackDetails,
@@ -636,25 +634,26 @@ class SpotifyController extends Controller
         $points = 0;
         $actionLabel = '';
         
+        // Points attribués en fonction de la stratégie marketing SPOT'VIP
         switch ($action) {
             case 'listen':
-                $points = 10;
+                $points = 1;  // 1 SPOINT par heure d'écoute
                 $actionLabel = 'Écoute de musique (1 heure)';
                 break;
             case 'playlist':
-                $points = 50;
+                $points = 50; // 50 SPOINTS par playlist créée et partagée
                 $actionLabel = 'Création et partage d\'une playlist';
                 break;
             case 'preview':
-                $points = 100;
+                $points = 100; // 100 SPOINTS pour écoute d'album en avant-première
                 $actionLabel = 'Écoute d\'un album en avant-première';
                 break;
             case 'event':
-                $points = 200;
+                $points = 200; // 200 SPOINTS pour participation à un événement
                 $actionLabel = 'Participation à un événement Spotify';
                 break;
             case 'interaction':
-                $points = 25;
+                $points = mt_rand(25, 50); // 25 à 50 SPOINTS par interaction avec un artiste
                 $actionLabel = 'Interaction avec un artiste';
                 break;
             default:
