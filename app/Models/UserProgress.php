@@ -53,7 +53,6 @@ class UserProgress
             'points' => $points
         ];
         
-        // Dans une vraie implémentation, on sauvegarderait en base de données
         return $this->current_points;
     }
     
@@ -69,23 +68,11 @@ class UserProgress
     }
     
     /**
-     * Retourne les points nécessaires pour atteindre un niveau
+     * Retourne les points nécessaires pour atteindre le niveau suivant
      */
-    public function getPointsForLevel(int $level)
+    public function getSpointsToNextLevel()
     {
-        // Exemple simple: 1000 points par niveau
-        return $level * 1000;
-    }
-    
-    /**
-     * Retourne le niveau correspondant à un palier
-     */
-    public function getTierForLevel(int $level)
-    {
-        if ($level < 5) return 'Bronze';
-        if ($level < 10) return 'Argent';
-        if ($level < 15) return 'Or';
-        return 'Platine';
+        return $this->max_points - $this->current_points;
     }
     
     /**
@@ -116,12 +103,6 @@ class UserProgress
         return $this->level;
     }
     
-    public function getTotalPoints()
-    {
-        // Dans un vrai système, ce serait la somme de tous les points gagnés
-        return $this->current_points + (($this->level - 1) * $this->max_points);
-    }
-    
     public function getActivities()
     {
         return $this->activities;
@@ -144,5 +125,16 @@ class UserProgress
     {
         $tier = $this->getTierForLevel($this->level);
         return $this->tier_colors[$tier] ?? '#1DB954'; // Couleur Spotify par défaut
+    }
+    
+    /**
+     * Retourne le palier correspondant au niveau
+     */
+    public function getTierForLevel(int $level)
+    {
+        if ($level < 5) return 'Bronze';
+        if ($level < 10) return 'Argent';
+        if ($level < 15) return 'Or';
+        return 'Platine';
     }
 }

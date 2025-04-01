@@ -6,7 +6,6 @@ use App\Models\Track;
 use App\Models\Album;
 use App\Models\Artist;
 use App\Models\Playlist;
-use App\Models\TrackDetails;
 use App\Models\UserProgress;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -87,17 +86,17 @@ class SpotifyController extends Controller
             // Récupérer les favoris de l'utilisateur
             $userFavorites = $this->getUserFavorites();
             
-            // Récupérer les nouveautés
-            $newReleases = $this->getNewReleases();
+            // Récupérer les playlists suggérées (basées sur les goûts de l'utilisateur)
+            $suggestedPlaylists = $this->getSuggestedPlaylists();
             
-            // Récupérer les playlists mises en avant
-            $featuredPlaylists = $this->getFeaturedPlaylists();
+            // Récupérer les albums suggérés (basés sur les goûts de l'utilisateur)
+            $suggestedAlbums = $this->getSuggestedAlbums();
             
             return view('pages.home', [
                 'userPlaylists' => $userPlaylists,
                 'userFavorites' => $userFavorites,
-                'newReleases' => $newReleases,
-                'featuredPlaylists' => $featuredPlaylists,
+                'suggestedPlaylists' => $suggestedPlaylists,
+                'suggestedAlbums' => $suggestedAlbums,
                 'userProgress' => $this->user_progress
             ]);
         } catch (\Exception $e) {
@@ -107,36 +106,14 @@ class SpotifyController extends Controller
     }
 
     /**
-     * Affiche la page de progression SPOT'VIP
-     */
-    public function progression()
-    {
-        return view('pages.progression', [
-            'userProgress' => $this->user_progress
-        ]);
-    }
-
-    /**
-     * Affiche la page de profil utilisateur avec le nouveau design
-     */
-    public function profile()
-    {
-        return view('pages.profile', [
-            'userProgress' => $this->user_progress,
-            'userPlaylists' => $this->getUserPlaylists(4) // Limite à 4 playlists
-        ]);
-    }
-
-    /**
-     * Récupère les playlists de l'utilisateur
+     * Récupère les playlists de l'utilisateur (simulé)
      */
     private function getUserPlaylists($limit = 4)
     {
         // Dans une application réelle, on récupérerait les playlists de l'utilisateur via l'API
-        // Mais pour cette démo, on va utiliser des données statiques similaires à l'écran 1
         $playlists = [];
         
-        // Images pour les playlists en fonction du design de la deuxième capture d'écran
+        // Images pour les playlists
         $images = [
             '/img/covers/playlist-1.jpg',
             '/img/covers/playlist-2.jpg',
@@ -159,14 +136,14 @@ class SpotifyController extends Controller
     }
 
     /**
-     * Récupère les favoris de l'utilisateur
+     * Récupère les favoris de l'utilisateur (simulé)
      */
     private function getUserFavorites()
     {
         // Pour la démo, on utilise des données statiques
         $favorites = [];
         
-        // Images similaires à la capture d'écran 2
+        // Images d'albums
         $images = [
             '/img/covers/album1.jpg',
             '/img/covers/album2.jpg',
@@ -174,13 +151,14 @@ class SpotifyController extends Controller
             '/img/covers/album4.jpg'
         ];
         
+        $artists = ['Artiste 1', 'Artiste 2', 'Artiste 3', 'Artiste 4'];
         $genres = ['Rap', 'Pop', 'Hip-hop', 'Électronique'];
         
         foreach ($images as $index => $image) {
             $favorites[] = new Album(
                 'favorite-' . ($index + 1),
                 'Album ' . ($index + 1),
-                'Artiste ' . ($index + 1),
+                $artists[$index],
                 'artist-' . ($index + 1),
                 Carbon::now()->subDays(mt_rand(1, 365))->locale('fr')->translatedFormat('d F Y'),
                 mt_rand(8, 16),
@@ -195,12 +173,70 @@ class SpotifyController extends Controller
     }
 
     /**
-     * Récupère les nouveautés via l'API Spotify
+     * Récupère les playlists suggérées (simulé)
      */
-    private function getNewReleases()
+    private function getSuggestedPlaylists()
     {
         try {
-            $response = $this->client->request('GET', 'https://api.spotify.com/v1/browse/new-releases?limit=10', [
+            // On utilise les featured playlists pour simuler les suggestions
+            $response = $this->client->request('GET', 'https://api.spotify.com/v1/browse/featured-playlists?limit=4', [
+                'headers' => [
+                    'Authorization' => 'Bearer ' . $this->api_token,
+                    'Accept' => 'application/json',
+                ]
+            ]);
+
+            $res = $response->getBody();
+            $objPlaylists = json_decode($res);
+            
+            $suggestedPlaylists = [];
+            foreach ($objPlaylists->playlists->items as $playlist) {
+                $suggestedPlaylists[] = new Playlist(
+                    $playlist->id,
+                    $playlist->name,
+                    $playlist->description ?? '',
+                    $playlist->owner->display_name,
+                    $playlist->images[0]->url,
+                    $playlist->tracks->total
+                );
+            }
+            
+            return $suggestedPlaylists;
+        } catch (\Exception $e) {
+            error_log('Erreur API Spotify (getSuggestedPlaylists): ' . $e->getMessage());
+            
+            // En cas d'erreur, utiliser des données de substitution
+            $data = [
+                ['id' => 'playlist1', 'name' => 'Mix Hip-Hop', 'image' => '/img/covers/playlist-1.jpg'],
+                ['id' => 'playlist2', 'name' => 'Nouveautés Pop', 'image' => '/img/covers/playlist-2.jpg'],
+                ['id' => 'playlist3', 'name' => 'Classiques Rap', 'image' => '/img/covers/playlist-3.jpg'],
+                ['id' => 'playlist4', 'name' => 'Électro Mix', 'image' => '/img/covers/playlist-4.jpg']
+            ];
+            
+            $suggestedPlaylists = [];
+            foreach ($data as $playlist) {
+                $suggestedPlaylists[] = new Playlist(
+                    $playlist['id'],
+                    $playlist['name'],
+                    'Playlist suggérée selon vos goûts',
+                    'Spotify',
+                    $playlist['image'],
+                    rand(20, 50)
+                );
+            }
+            
+            return $suggestedPlaylists;
+        }
+    }
+
+    /**
+     * Récupère les albums suggérés (simulé)
+     */
+    private function getSuggestedAlbums()
+    {
+        try {
+            // On utilise les new releases pour simuler les suggestions
+            $response = $this->client->request('GET', 'https://api.spotify.com/v1/browse/new-releases?limit=4', [
                 'headers' => [
                     'Authorization' => 'Bearer ' . $this->api_token,
                     'Accept' => 'application/json',
@@ -210,12 +246,12 @@ class SpotifyController extends Controller
             $res = $response->getBody();
             $objReleases = json_decode($res);
             
-            $newReleases = [];
+            $suggestedAlbums = [];
             foreach ($objReleases->albums->items as $album) {
                 // Convertir la date de sortie en français
                 $frDate = Carbon::parse($album->release_date)->locale('fr')->translatedFormat('d F Y');
                 
-                $newReleases[] = new Album(
+                $suggestedAlbums[] = new Album(
                     $album->id,
                     $album->name,
                     $album->artists[0]->name,
@@ -226,21 +262,21 @@ class SpotifyController extends Controller
                 );
             }
             
-            return $newReleases;
+            return $suggestedAlbums;
         } catch (\Exception $e) {
-            error_log('Erreur API Spotify (getNewReleases): ' . $e->getMessage());
+            error_log('Erreur API Spotify (getSuggestedAlbums): ' . $e->getMessage());
             
             // En cas d'erreur, utiliser des données de substitution
             $data = [
-                ['id' => 'album1', 'name' => 'New Release 1', 'artist' => 'Artist 1', 'image' => '/img/covers/album1.jpg'],
-                ['id' => 'album2', 'name' => 'New Release 2', 'artist' => 'Artist 2', 'image' => '/img/covers/album2.jpg'],
-                ['id' => 'album3', 'name' => 'New Release 3', 'artist' => 'Artist 3', 'image' => '/img/covers/album3.jpg'],
-                ['id' => 'album4', 'name' => 'New Release 4', 'artist' => 'Artist 4', 'image' => '/img/covers/album4.jpg']
+                ['id' => 'album1', 'name' => 'Album Rap 2024', 'artist' => 'Artiste Rap', 'image' => '/img/covers/album1.jpg'],
+                ['id' => 'album2', 'name' => 'Hits Pop', 'artist' => 'Artiste Pop', 'image' => '/img/covers/album2.jpg'],
+                ['id' => 'album3', 'name' => 'Électro Mix', 'artist' => 'DJ Électro', 'image' => '/img/covers/album3.jpg'],
+                ['id' => 'album4', 'name' => 'Hip-Hop 2024', 'artist' => 'Artiste Hip-Hop', 'image' => '/img/covers/album4.jpg']
             ];
             
-            $newReleases = [];
+            $suggestedAlbums = [];
             foreach ($data as $album) {
-                $newReleases[] = new Album(
+                $suggestedAlbums[] = new Album(
                     $album['id'],
                     $album['name'],
                     $album['artist'],
@@ -251,64 +287,29 @@ class SpotifyController extends Controller
                 );
             }
             
-            return $newReleases;
+            return $suggestedAlbums;
         }
     }
 
     /**
-     * Récupère les playlists mises en avant via l'API Spotify
+     * Affiche la page de progression SPOT'VIP
      */
-    private function getFeaturedPlaylists()
+    public function progression()
     {
-        try {
-            $response = $this->client->request('GET', 'https://api.spotify.com/v1/browse/featured-playlists?limit=10', [
-                'headers' => [
-                    'Authorization' => 'Bearer ' . $this->api_token,
-                    'Accept' => 'application/json',
-                ]
-            ]);
+        return view('pages.progression', [
+            'userProgress' => $this->user_progress
+        ]);
+    }
 
-            $res = $response->getBody();
-            $objPlaylists = json_decode($res);
-            
-            $featuredPlaylists = [];
-            foreach ($objPlaylists->playlists->items as $playlist) {
-                $featuredPlaylists[] = new Playlist(
-                    $playlist->id,
-                    $playlist->name,
-                    $playlist->description ?? '',
-                    $playlist->owner->display_name,
-                    $playlist->images[0]->url,
-                    $playlist->tracks->total
-                );
-            }
-            
-            return $featuredPlaylists;
-        } catch (\Exception $e) {
-            error_log('Erreur API Spotify (getFeaturedPlaylists): ' . $e->getMessage());
-            
-            // En cas d'erreur, utiliser des données de substitution
-            $data = [
-                ['id' => 'playlist1', 'name' => 'Featured Playlist 1', 'image' => '/img/covers/playlist-1.jpg'],
-                ['id' => 'playlist2', 'name' => 'Featured Playlist 2', 'image' => '/img/covers/playlist-2.jpg'],
-                ['id' => 'playlist3', 'name' => 'Featured Playlist 3', 'image' => '/img/covers/playlist-3.jpg'],
-                ['id' => 'playlist4', 'name' => 'Featured Playlist 4', 'image' => '/img/covers/playlist-4.jpg']
-            ];
-            
-            $featuredPlaylists = [];
-            foreach ($data as $playlist) {
-                $featuredPlaylists[] = new Playlist(
-                    $playlist['id'],
-                    $playlist['name'],
-                    'Playlist mise en avant selon vos goûts',
-                    'Spotify',
-                    $playlist['image'],
-                    rand(20, 50)
-                );
-            }
-            
-            return $featuredPlaylists;
-        }
+    /**
+     * Affiche la page de profil utilisateur
+     */
+    public function profile()
+    {
+        return view('pages.profile', [
+            'userProgress' => $this->user_progress,
+            'userPlaylists' => $this->getUserPlaylists(4)
+        ]);
     }
 
     /**
@@ -328,7 +329,7 @@ class SpotifyController extends Controller
             $res = $response->getBody();
             $objTrack = json_decode($res);
             
-            // Récupérer les features audio de la piste (danceability, energy, etc.)
+            // Récupérer les features audio de la piste
             $audioFeaturesResponse = $this->client->request('GET', 'https://api.spotify.com/v1/audio-features/' . $id, [
                 'headers' => [
                     'Authorization' => 'Bearer ' . $this->api_token,
@@ -338,20 +339,6 @@ class SpotifyController extends Controller
             
             $audioFeaturesRes = $audioFeaturesResponse->getBody();
             $objAudioFeatures = json_decode($audioFeaturesRes);
-            
-            // Récupérer les détails de l'album
-            $albumResponse = $this->client->request('GET', 'https://api.spotify.com/v1/albums/' . $objTrack->album->id, [
-                'headers' => [
-                    'Authorization' => 'Bearer ' . $this->api_token,
-                    'Accept' => 'application/json',
-                ]
-            ]);
-            
-            $albumRes = $albumResponse->getBody();
-            $objAlbum = json_decode($albumRes);
-            
-            // Convertir la date de sortie en français
-            $frDate = Carbon::parse($objAlbum->release_date)->locale('fr')->translatedFormat('d F Y');
             
             // Récupérer les artistes
             $artists = [];
@@ -366,7 +353,7 @@ class SpotifyController extends Controller
                 $artists,
                 $objTrack->album->name,
                 $objTrack->album->id,
-                $frDate,
+                Carbon::parse($objTrack->album->release_date)->locale('fr')->translatedFormat('d F Y'),
                 $objTrack->duration_ms,
                 $objTrack->popularity,
                 $objAudioFeatures->danceability,
@@ -378,7 +365,7 @@ class SpotifyController extends Controller
                 $objTrack->album->images[0]->url
             );
             
-            // Ajouter des SPOINTS pour l'écoute (dans un cas réel, vérifier si c'est la première écoute)
+            // Ajouter des SPOINTS pour l'écoute
             $this->user_progress->addPoints(10, 'Écoute de titre');
             
             return view('pages.track-details', [
@@ -489,9 +476,6 @@ class SpotifyController extends Controller
                     'artists' => $this->transformArtists($objResults->artists->items ?? []),
                     'playlists' => $this->transformPlaylists($objResults->playlists->items ?? [])
                 ];
-                
-                // Ajouter des SPOINTS pour la recherche
-                $this->user_progress->addPoints(5, 'Recherche effectuée');
             } catch (\Exception $e) {
                 error_log('Erreur API Spotify (search): ' . $e->getMessage());
                 $results = [];
@@ -501,7 +485,6 @@ class SpotifyController extends Controller
         return view('pages.search', [
             'query' => $query,
             'results' => $results,
-            'genres' => $this->getGenresList(),
             'userProgress' => $this->user_progress
         ]);
     }
@@ -587,95 +570,5 @@ class SpotifyController extends Controller
             );
         }
         return $transformed;
-    }
-
-    /**
-     * Récupération des genres
-     */
-    private function getGenresList()
-    {
-        try {
-            $response = $this->client->request('GET', 'https://api.spotify.com/v1/recommendations/available-genre-seeds', [
-                'headers' => [
-                    'Authorization' => 'Bearer ' . $this->api_token,
-                    'Accept' => 'application/json',
-                ]
-            ]);
-            
-            $res = $response->getBody();
-            $genres = json_decode($res)->genres;
-            return $genres;
-        } catch (\Exception $e) {
-            error_log('Erreur récupération genres: ' . $e->getMessage());
-            return [
-                'Pop', 'Rock', 'Hip-Hop', 'R&B', 'Electronic', 'Dance', 
-                'Jazz', 'Classical', 'Country', 'Folk', 'Metal', 'Punk', 
-                'Indie', 'Alternative', 'Reggae', 'Blues', 'Soul'
-            ];
-        }
-    }
-
-    /**
-     * Ajouter des points SPOT'VIP
-     */
-    public function addPoints(Request $request)
-    {
-        $action = $request->input('action');
-        $points = $request->input('points', 0);
-        
-        $this->user_progress->addPoints($points, $action);
-        
-        return redirect()->back()->with('message', "Vous avez gagné $points SPOINTS pour l'action : $action");
-    }
-    
-    /**
-     * Simuler des actions pour gagner des points (pour la démonstration)
-     */
-    public function simulateAction(Request $request, $action)
-    {
-        $points = 0;
-        $actionLabel = '';
-        
-        switch ($action) {
-            case 'listen':
-                $points = 10;
-                $actionLabel = 'Écoute de musique (1 heure)';
-                break;
-            case 'playlist':
-                $points = 50;
-                $actionLabel = 'Création et partage d\'une playlist';
-                break;
-            case 'preview':
-                $points = 100;
-                $actionLabel = 'Écoute d\'un album en avant-première';
-                break;
-            case 'event':
-                $points = 200;
-                $actionLabel = 'Participation à un événement Spotify';
-                break;
-            case 'interaction':
-                $points = 25;
-                $actionLabel = 'Interaction avec un artiste';
-                break;
-            default:
-                $points = 5;
-                $actionLabel = 'Action générique';
-        }
-        
-        $this->user_progress->addPoints($points, $actionLabel);
-        
-        return redirect()->back()->with('success', "Vous avez gagné $points SPOINTS pour l'action : $actionLabel");
-    }
-    
-    /**
-     * Page de bibliothèque (simplifiée pour la démo)
-     */
-    public function library()
-    {
-        return view('pages.library', [
-            'userPlaylists' => $this->getUserPlaylists(8),
-            'userFavorites' => $this->getUserFavorites(),
-            'userProgress' => $this->user_progress
-        ]);
     }
 }

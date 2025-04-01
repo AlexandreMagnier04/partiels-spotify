@@ -183,7 +183,7 @@
             }
             
             // Animation des cartes
-            const cards = document.querySelectorAll('.playlist-card, .album-card');
+            const cards = document.querySelectorAll('.content-card, .playlist-card, .album-card, .favorite-card');
             cards.forEach(card => {
                 card.addEventListener('mouseenter', function() {
                     this.style.transform = 'scale(1.05)';
