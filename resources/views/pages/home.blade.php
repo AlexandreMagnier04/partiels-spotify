@@ -3,7 +3,23 @@
 @section('title', 'Accueil')
 
 @section('content')
+{{-- Cette page a été modifiée pour utiliser vos images spécifiques --}}
 <div class="main-content">
+    <!-- Barre de recherche tout en haut centrée -->
+    <div class="top-search-container">
+        <div class="search-buttons">
+            <a href="{{ route('home') }}" class="home-button">
+                <i class="fas fa-home"></i>
+            </a>
+        </div>
+        <form action="{{ route('search') }}" method="GET">
+            <div class="search-input-wrapper">
+                <i class="fas fa-search search-icon"></i>
+                <input type="text" class="search-input" name="q" placeholder="Que souhaitez-vous écouter ?">
+            </div>
+        </form>
+    </div>
+    
     <!-- En-tête avec informations utilisateur -->
     <div class="user-welcome">
         <div class="user-header">
@@ -18,7 +34,7 @@
             </a>
         </div>
         
-        <div class="progress-section">
+        <div class="progress-section-left">
             <h3 class="progress-title">Ma progression</h3>
             <div class="spotvip-progress">
                 <div class="spotvip-bar" style="width: {{ $userProgress->getProgressPercentage() }}%;"></div>
@@ -30,102 +46,148 @@
         </div>
     </div>
 
-    <!-- Contenu principal en 2 colonnes -->
-    <div class="two-column-layout">
-        <!-- Colonne gauche -->
-        <div class="column">
-            <!-- Mes playlists -->
-            <div class="section">
+    <!-- Première section avec séparation verticale -->
+    <div class="first-section">
+        <!-- Mes playlists et suggestions de playlists -->
+        <div class="section-row">
+            <div class="column">
                 <h2 class="section-title spotify-green">Mes playlists</h2>
                 <div class="card-grid">
-                    @foreach($userPlaylists as $index => $playlist)
-                        @if($index < 4)
-                        <div class="content-card">
-                            <img src="{{ $playlist->getImageUrl() }}" alt="{{ $playlist->getName() }}" class="card-cover">
-                            <div class="card-info">
-                                <div class="card-title">{{ $playlist->getName() }}</div>
-                            </div>
-                        </div>
-                        @endif
-                    @endforeach
+                    <div class="content-card">
+                        <img src="/img/playlist-1.png" alt="Ma playlist 1" class="card-cover">
+                    </div>
+                    <div class="content-card">
+                        <img src="/img/playlist-2.png" alt="Ma playlist 2" class="card-cover">
+                    </div>
+                    <div class="content-card">
+                        <img src="/img/playlist-7.png" alt="Ma playlist 3" class="card-cover">
+                    </div>
+                    <div class="content-card">
+                        <img src="/img/playlist-3.png" alt="Ma playlist 4" class="card-cover">
+                    </div>
                 </div>
             </div>
             
-            <!-- Mes albums favoris -->
-            <div class="section">
-                <h2 class="section-title spotify-green">Albums favoris</h2>
+            <!-- Séparateur vertical -->
+            <div class="vertical-divider"></div>
+            
+            <div class="column">
+                <h2 class="section-title spotify-green">Playlists suggérées</h2>
                 <div class="card-grid">
-                    @foreach($userFavorites as $index => $album)
-                        @if($index < 4)
-                        <div class="content-card">
-                            <img src="{{ $album->getImageUrl() }}" alt="{{ $album->getName() }}" class="card-cover">
-                            <div class="card-info">
-                                <div class="card-title">{{ $album->getName() }}</div>
-                                <div class="card-subtitle">{{ $album->getArtist() }}</div>
-                            </div>
-                        </div>
-                        @endif
-                    @endforeach
+                    <div class="content-card">
+                        <img src="/img/playlist-3.png" alt="Playlist suggérée 1" class="card-cover">
+                    </div>
+                    <div class="content-card">
+                        <img src="/img/playlist-3.png" alt="Playlist suggérée 2" class="card-cover">
+                    </div>
+                    <div class="content-card">
+                        <img src="/img/playlist-3.png" alt="Playlist suggérée 3" class="card-cover">
+                    </div>
+                    <div class="content-card">
+                        <img src="/img/playlist-3.png" alt="Playlist suggérée 4" class="card-cover">
+                    </div>
                 </div>
             </div>
         </div>
-        
-        <!-- Séparateur vertical -->
-        <div class="vertical-divider"></div>
-        
-        <!-- Colonne droite (suggestions) -->
-        <div class="column">
-            <h2 class="column-title spotify-green text-center">Pensé pour moi</h2>
-            
-            <!-- Playlists suggérées -->
-            <div class="section">
-                <h3 class="section-subtitle spotify-green">Playlists</h3>
-                <div class="card-grid">
-                    @foreach($suggestedPlaylists as $index => $playlist)
-                        @if($index < 4)
-                        <div class="content-card">
-                            <img src="{{ $playlist->getImageUrl() }}" alt="{{ $playlist->getName() }}" class="card-cover">
-                            <div class="card-info">
-                                <div class="card-title">{{ $playlist->getName() }}</div>
-                            </div>
-                        </div>
-                        @endif
-                    @endforeach
-                </div>
-            </div>
-            
-            <!-- Albums suggérés -->
-            <div class="section">
-                <h3 class="section-subtitle spotify-green">Album</h3>
-                <div class="card-grid">
-                    @foreach($userFavorites as $index => $album)
-                        @if($index < 4)
-                        <div class="content-card">
-                            <img src="{{ $album->getImageUrl() }}" alt="{{ $album->getName() }}" class="card-cover">
-                            <div class="card-info">
-                                <div class="card-title">{{ $album->getName() }}</div>
-                                <div class="card-subtitle">{{ $album->getArtist() }}</div>
-                            </div>
-                        </div>
-                        @endif
-                    @endforeach
-                </div>
-            </div>
 
-            <!-- nouveautés -->
-            <div class="card-grid">
-                @foreach($suggestedAlbums as $index => $album)
-                    @if($index < 4)
+        <!-- Albums favoris et suggestions d'albums -->
+        <div class="section-row">
+            <div class="column">
+                <h2 class="section-title spotify-green">Albums favoris</h2>
+                <div class="card-grid">
                     <div class="content-card">
-                        <img src="{{ $album->getImageUrl() }}" alt="{{ $album->getName() }}" class="card-cover">
-                        <div class="card-info">
-                            <div class="card-title">{{ $album->getName() }}</div>
-                            <div class="card-subtitle">{{ $album->getArtist() }}</div>
-                        </div>
+                        <img src="/img/playlist-3.png" alt="Album 1" class="card-cover">
                     </div>
-                    @endif
-                @endforeach
+                    <div class="content-card">
+                        <img src="/img/playlist-3.png" alt="Album 2" class="card-cover">
+                    </div>
+                    <div class="content-card">
+                        <img src="/img/playlist-3.png" alt="Album 3" class="card-cover">
+                    </div>
+                    <div class="content-card">
+                        <img src="/img/playlist-3.png" alt="Album 4" class="card-cover">
+                    </div>
+                </div>
             </div>
+            
+            <!-- Séparateur vertical -->
+            <div class="vertical-divider"></div>
+            
+            <div class="column">
+                <h2 class="section-title spotify-green">Albums suggérés</h2>
+                <div class="card-grid">
+                    <div class="content-card">
+                        <img src="/img/playlist-3.png" alt="Album suggéré 1" class="card-cover">
+                    </div>
+                    <div class="content-card">
+                        <img src="/img/playlist-3.png" alt="Album suggéré 2" class="card-cover">
+                    </div>
+                    <div class="content-card">
+                        <img src="/img/playlist-3.png" alt="Album suggéré 3" class="card-cover">
+                    </div>
+                    <div class="content-card">
+                        <img src="/img/playlist-3.png" alt="Album suggéré 4" class="card-cover">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mes artistes et suggestions d'artistes -->
+        <div class="section-row">
+            <div class="column">
+                <h2 class="section-title spotify-green">Mes artistes</h2>
+                <div class="card-grid">
+                    <div class="content-card artist-card">
+                        <img src="/img/covers/david-guetta.png" alt="David Guetta" class="card-cover artist-cover">
+                    </div>
+                    <div class="content-card artist-card">
+                        <img src="/img/playlist-3.png" alt="Gazo" class="card-cover artist-cover">
+                    </div>
+                    <div class="content-card artist-card">
+                        <img src="/img/playlist-3.png" alt="Artiste 1" class="card-cover artist-cover">
+                    </div>
+                    <div class="content-card artist-card">
+                        <img src="/img/playlist-3.png" alt="Artiste 2" class="card-cover artist-cover">
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Séparateur vertical -->
+            <div class="vertical-divider"></div>
+            
+            <div class="column">
+                <h2 class="section-title spotify-green">Artistes suggérés</h2>
+                <div class="card-grid">
+                    <div class="content-card artist-card">
+                        <img src="/img/playlist-3.png" alt="Artiste suggéré 1" class="card-cover artist-cover">
+                    </div>
+                    <div class="content-card artist-card">
+                        <img src="/img/playlist-3.png" alt="Artiste suggéré 2" class="card-cover artist-cover">
+                    </div>
+                    <div class="content-card artist-card">
+                        <img src="/img/playlist-3.png" alt="Artiste suggéré 3" class="card-cover artist-cover">
+                    </div>
+                    <div class="content-card artist-card">
+                        <img src="/img/playlist-3.png" alt="Artiste suggéré 4" class="card-cover artist-cover">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Deuxième section sans séparation verticale -->
+    <div class="second-section">
+        <h2 class="section-title spotify-green full-width-title">Nouveautés</h2>
+        <div class="card-grid wide-grid">
+            @foreach($suggestedAlbums as $index => $album)
+                <div class="content-card">
+                    <img src="{{ $album->getImageUrl() }}" alt="{{ $album->getName() }}" class="card-cover">
+                    <div class="card-info">
+                        <div class="card-title">{{ $album->getName() }}</div>
+                        <div class="card-subtitle">{{ $album->getArtist() }}</div>
+                    </div>
+                </div>
+            @endforeach
         </div>
     </div>
 </div>
@@ -135,6 +197,74 @@
 <style>
     .main-content {
         padding: 20px 30px;
+    }
+    
+    /* Barre de recherche tout en haut centrée */
+    .top-search-container {
+        display: flex;
+        align-items: center;
+        margin-bottom: 30px;
+        position: relative;
+        padding: 5px 0;
+        justify-content: center;
+    }
+    
+    .search-buttons {
+        position: absolute;
+        left: 0;
+        display: flex;
+        align-items: center;
+    }
+    
+    .home-button {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background-color: var(--spotify-dark-gray);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--spotify-white);
+        transition: background-color 0.3s;
+    }
+    
+    .home-button:hover {
+        background-color: var(--spotify-medium-gray);
+        text-decoration: none;
+    }
+    
+    .search-input-wrapper {
+        position: relative;
+        width: 500px;
+        max-width: 90%;
+    }
+    
+    .search-icon {
+        position: absolute;
+        left: 15px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--spotify-off-white);
+        font-size: 16px;
+    }
+    
+    .search-input {
+        width: 100%;
+        padding: 12px 15px 12px 45px;
+        border-radius: 30px;
+        border: none;
+        background-color: var(--spotify-medium-gray);
+        color: var(--spotify-white);
+        font-size: 14px;
+    }
+    
+    .search-input:focus {
+        outline: none;
+        background-color: var(--spotify-light-gray);
+    }
+    
+    .search-input::placeholder {
+        color: var(--spotify-off-white);
     }
     
     /* En-tête avec informations utilisateur */
@@ -165,6 +295,7 @@
         font-size: 28px;
         font-weight: bold;
         margin-right: 15px;
+        color: white;
     }
     
     .profile-link {
@@ -192,14 +323,18 @@
         font-weight: bold;
     }
     
-    .progress-section {
+    /* Barre de progression alignée à gauche */
+    .progress-section-left {
         max-width: 500px;
+        margin-left: 75px;
+        margin-top: 10px;
     }
     
     .progress-title {
         font-size: 16px;
         margin-bottom: 10px;
         color: var(--spotify-off-white);
+        text-align: left;
     }
     
     .spotvip-progress {
@@ -223,10 +358,18 @@
         color: var(--spotify-off-white);
     }
     
-    /* Layout en deux colonnes */
-    .two-column-layout {
+    /* Layout des sections */
+    .first-section, .second-section {
+        margin-bottom: 40px;
+    }
+    
+    .section-row {
         display: flex;
-        position: relative;
+        margin-bottom: 40px;
+    }
+    
+    .second-section .section-row {
+        margin-bottom: 0;
     }
     
     .column {
@@ -238,24 +381,7 @@
         width: 2px;
         background-color: var(--spotify-green);
         margin: 0 20px;
-    }
-    
-    .column-title {
-        font-size: 1.8rem;
-        font-weight: bold;
-        margin-bottom: 20px;
-    }
-    
-    .text-center {
-        text-align: center;
-    }
-    
-    .spotify-green {
-        color: var(--spotify-green);
-    }
-    
-    .section {
-        margin-bottom: 30px;
+        height: auto;
     }
     
     .section-title {
@@ -264,17 +390,25 @@
         margin-bottom: 15px;
     }
     
-    .section-subtitle {
-        font-size: 1.2rem;
-        font-weight: bold;
-        margin-bottom: 15px;
+    .full-width-title {
+        padding: 0 20px;
+        margin-bottom: 20px;
     }
     
-    /* Grille de cartes */
+    .spotify-green {
+        color: var(--spotify-green);
+    }
+    
+    /* Grilles de cartes */
     .card-grid {
         display: grid;
         grid-template-columns: repeat(2, 1fr);
         gap: 15px;
+    }
+    
+    .wide-grid {
+        grid-template-columns: repeat(4, 1fr);
+        padding: 0 20px;
     }
     
     .content-card {
@@ -295,6 +429,10 @@
         object-fit: cover;
     }
     
+    .artist-cover {
+        border-radius: 50%;
+    }
+    
     .card-info {
         padding: 10px;
     }
@@ -312,8 +450,14 @@
     }
     
     /* Responsive */
+    @media (max-width: 1024px) {
+        .wide-grid {
+            grid-template-columns: repeat(3, 1fr);
+        }
+    }
+    
     @media (max-width: 768px) {
-        .two-column-layout {
+        .section-row {
             flex-direction: column;
         }
         
@@ -321,6 +465,24 @@
             width: auto;
             height: 2px;
             margin: 20px 0;
+        }
+        
+        .wide-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+        
+        .search-container {
+            margin-top: 30px;
+        }
+        
+        .search-input-wrapper {
+            max-width: 100%;
+        }
+    }
+    
+    @media (max-width: 480px) {
+        .card-grid, .wide-grid {
+            grid-template-columns: 1fr;
         }
     }
 </style>
