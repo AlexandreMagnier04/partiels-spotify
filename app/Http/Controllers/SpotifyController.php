@@ -6,6 +6,7 @@ use App\Models\Album;
 use App\Models\UserProgress;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use App\Models\Playlist;
 
 class SpotifyController extends Controller
 {
@@ -167,11 +168,32 @@ class SpotifyController extends Controller
      * Affiche la page de profil utilisateur
      */
     public function profile()
-    {
-        return view('pages.profile', [
-            'userProgress' => $this->user_progress
-        ]);
+{
+    // Créer des playlists fictives pour la page de profil
+    $userPlaylists = [];
+    $images = [
+        '/img/playlist-1.png',
+        '/img/playlist-2.png',
+        '/img/playlist-3.png',
+        '/img/playlist-7.png'
+    ];
+    
+    for ($i = 1; $i <= 4; $i++) {
+        $userPlaylists[] = new Playlist(
+            'playlist-' . $i,
+            'Playlist ' . $i,
+            'Ma playlist numéro ' . $i,
+            'Hugo',
+            $images[$i-1],
+            mt_rand(10, 100)
+        );
     }
+    
+    return view('pages.profile', [
+        'userProgress' => $this->user_progress,
+        'userPlaylists' => $userPlaylists
+    ]);
+}
     
     /**
      * Affiche les détails d'un album

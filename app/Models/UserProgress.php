@@ -137,4 +137,20 @@ class UserProgress
         if ($level < 15) return 'Or';
         return 'Platine';
     }
+
+    /**
+ * Calcule les points nécessaires pour atteindre un niveau spécifique
+ * 
+ * @param int $level Le niveau cible
+ * @return int Le nombre de points nécessaires
+ */
+    public function getPointsForLevel($level)
+    {
+    // Calcul simple pour les points requis par niveau
+    // 10000 points pour le niveau 1, puis augmentation de 5000 par niveau
+    $basePoints = 10000;
+    $incrementPerLevel = 5000;
+    
+    return $basePoints + ($level - 1) * $incrementPerLevel;
+    }
 }

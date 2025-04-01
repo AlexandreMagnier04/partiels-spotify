@@ -75,16 +75,16 @@
                 <h2 class="section-title spotify-green">Playlists suggérées</h2>
                 <div class="card-grid">
                     <div class="content-card">
-                        <img src="/img/playlist-3.png" alt="Playlist suggérée 1" class="card-cover">
+                        <img src="/img/playlist-4.png" alt="Playlist suggérée 1" class="card-cover">
                     </div>
                     <div class="content-card">
-                        <img src="/img/playlist-3.png" alt="Playlist suggérée 2" class="card-cover">
+                        <img src="/img/playlist-5.png" alt="Playlist suggérée 2" class="card-cover">
                     </div>
                     <div class="content-card">
-                        <img src="/img/playlist-3.png" alt="Playlist suggérée 3" class="card-cover">
+                        <img src="/img/playlist-6.png" alt="Playlist suggérée 3" class="card-cover">
                     </div>
                     <div class="content-card">
-                        <img src="/img/playlist-3.png" alt="Playlist suggérée 4" class="card-cover">
+                        <img src="/img/playlist-8.png" alt="Playlist suggérée 4" class="card-cover">
                     </div>
                 </div>
             </div>
@@ -96,16 +96,16 @@
                 <h2 class="section-title spotify-green">Albums favoris</h2>
                 <div class="card-grid">
                     <div class="content-card">
-                        <img src="/img/playlist-3.png" alt="Album 1" class="card-cover">
+                        <img src="/img/album-1.png" alt="Album 1" class="card-cover">
                     </div>
                     <div class="content-card">
-                        <img src="/img/playlist-3.png" alt="Album 2" class="card-cover">
+                        <img src="/img/album-2.png" alt="Album 2" class="card-cover">
                     </div>
                     <div class="content-card">
-                        <img src="/img/playlist-3.png" alt="Album 3" class="card-cover">
+                        <img src="/img/album-8.png" alt="Album 3" class="card-cover">
                     </div>
                     <div class="content-card">
-                        <img src="/img/playlist-3.png" alt="Album 4" class="card-cover">
+                        <img src="/img/album-9.png" alt="Album 4" class="card-cover">
                     </div>
                 </div>
             </div>
@@ -117,16 +117,16 @@
                 <h2 class="section-title spotify-green">Albums suggérés</h2>
                 <div class="card-grid">
                     <div class="content-card">
-                        <img src="/img/playlist-3.png" alt="Album suggéré 1" class="card-cover">
+                        <img src="/img/album-3.png" alt="Album suggéré 1" class="card-cover">
                     </div>
                     <div class="content-card">
-                        <img src="/img/playlist-3.png" alt="Album suggéré 2" class="card-cover">
+                        <img src="/img/album-4.png" alt="Album suggéré 2" class="card-cover">
                     </div>
                     <div class="content-card">
-                        <img src="/img/playlist-3.png" alt="Album suggéré 3" class="card-cover">
+                        <img src="/img/album-7.png" alt="Album suggéré 3" class="card-cover">
                     </div>
                     <div class="content-card">
-                        <img src="/img/playlist-3.png" alt="Album suggéré 4" class="card-cover">
+                        <img src="/img/album-10.png" alt="Album suggéré 4" class="card-cover">
                     </div>
                 </div>
             </div>
@@ -137,17 +137,17 @@
             <div class="column">
                 <h2 class="section-title spotify-green">Mes artistes</h2>
                 <div class="card-grid">
-                    <div class="content-card artist-card">
-                        <img src="/img/covers/david-guetta.png" alt="David Guetta" class="card-cover artist-cover">
+                    <div class="content-card">
+                        <img src="/img/david-guetta.jpeg" alt="David Guetta" class="card-cover artist-cover">
                     </div>
-                    <div class="content-card artist-card">
-                        <img src="/img/playlist-3.png" alt="Gazo" class="card-cover artist-cover">
+                    <div class="content-card">
+                        <img src="/img/AT-_-GAZO.jpg" alt="Gazo" class="card-cover artist-cover">
                     </div>
-                    <div class="content-card artist-card">
-                        <img src="/img/playlist-3.png" alt="Artiste 1" class="card-cover artist-cover">
+                    <div class="content-card">
+                        <img src="/img/gimd.jpg" alt="Artiste 1" class="card-cover artist-cover">
                     </div>
-                    <div class="content-card artist-card">
-                        <img src="/img/playlist-3.png" alt="Artiste 2" class="card-cover artist-cover">
+                    <div class="content-card ">
+                        <img src="/img/guy2bezbar.jpg" alt="Artiste 2" class="card-cover artist-cover">
                     </div>
                 </div>
             </div>
@@ -158,17 +158,17 @@
             <div class="column">
                 <h2 class="section-title spotify-green">Artistes suggérés</h2>
                 <div class="card-grid">
-                    <div class="content-card artist-card">
-                        <img src="/img/playlist-3.png" alt="Artiste suggéré 1" class="card-cover artist-cover">
+                    <div class="content-card">
+                        <img src="/img/iam.avif" alt="Artiste suggéré 1" class="card-cover artist-cover">
                     </div>
-                    <div class="content-card artist-card">
-                        <img src="/img/playlist-3.png" alt="Artiste suggéré 2" class="card-cover artist-cover">
+                    <div class="content-card">
+                        <img src="/img/" alt="Artiste suggéré 2" class="card-cover artist-cover">
                     </div>
-                    <div class="content-card artist-card">
-                        <img src="/img/playlist-3.png" alt="Artiste suggéré 3" class="card-cover artist-cover">
+                    <div class="content-card">
+                        <img src="/img/" alt="Artiste suggéré 3" class="card-cover artist-cover">
                     </div>
-                    <div class="content-card artist-card">
-                        <img src="/img/playlist-3.png" alt="Artiste suggéré 4" class="card-cover artist-cover">
+                    <div class="content-card">
+                        <img src="/img/" alt="Artiste suggéré 4" class="card-cover artist-cover">
                     </div>
                 </div>
             </div>
@@ -400,54 +400,53 @@
     }
     
     /* Grilles de cartes */
-    .card-grid {
-        display: grid;
-        grid-template-columns: repeat(2, 1fr);
-        gap: 15px;
-    }
-    
-    .wide-grid {
-        grid-template-columns: repeat(4, 1fr);
-        padding: 0 20px;
-    }
-    
-    .content-card {
-        background-color: rgba(255, 255, 255, 0.05);
-        border-radius: 6px;
-        overflow: hidden;
-        transition: background-color 0.3s, transform 0.3s;
-    }
-    
-    .content-card:hover {
-        background-color: rgba(255, 255, 255, 0.1);
-        transform: scale(1.05);
-    }
-    
-    .card-cover {
-        width: 100%;
-        aspect-ratio: 1;
-        object-fit: cover;
-    }
-    
-    .artist-cover {
-        border-radius: 50%;
-    }
-    
-    .card-info {
-        padding: 10px;
-    }
-    
-    .card-title {
-        font-weight: 600;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-    }
-    
-    .card-subtitle {
-        font-size: 0.9rem;
-        color: var(--spotify-off-white);
-    }
+   
+/* Réduire la taille de toutes les cards */
+.card-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px; /* Réduit l'espace entre les cartes */
+}
+
+.content-card {
+    max-width: 140px; /* Limite la largeur maximale */
+    max-height: 180px; /* Limite la hauteur maximale */
+    margin: 0 auto; /* Centre si nécessaire */
+}
+
+.card-cover {
+    width: 100%;
+    height: auto;
+    max-height: 140px;
+    object-fit: cover;
+}
+
+/* Pour les artistes (images circulaires) */
+.artist-card .card-cover {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+}
+
+/* Pour les images de mix */
+.mix-cover img {
+    width: 50px;
+    height: 50px;
+    object-fit: cover;
+}
+
+/* Pour les images de playlist dans la page profil */
+.playlist-cover img {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+}
+
+/* Ajuster la grille des nouveautés */
+.wide-grid {
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 15px;
+}
     
     /* Responsive */
     @media (max-width: 1024px) {
