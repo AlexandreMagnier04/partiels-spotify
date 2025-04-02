@@ -215,9 +215,13 @@ a:hover {
 }
 
 .playlist-cover {
-    height: 80px;
-    width: 80px;
-    object-fit: cover;
+    transition: 0.3s all ease-in-out;
+    overflow: visible;
+    cursor: pointer;
+}
+
+.playlist-cover:hover{
+    transform: translateY(-10px);
 }
 
 .playlist-info {
@@ -701,7 +705,6 @@ a:hover {
 
 .column {
     flex: 1;
-    padding: 0 20px;
 }
 
 .vertical-divider {
@@ -1580,6 +1583,10 @@ body.sidebar-open .menu-toggle{
     body.sidebar-open .main-content {
         width: calc(100% - var(--sidebar-width));
     }
+
+    body.sidebar-open .column{
+        padding: 0;
+    }
     
     .sidebar-overlay {
         display: none !important; /* Jamais d'overlay sur desktop */
@@ -1634,7 +1641,8 @@ body.sidebar-open .menu-toggle{
     }
 
     body.sidebar-open .menu-toggle{
-        left: calc(var(--sidebar-width-responsive) + 20px);
+        left: 20px;
+        z-index: -1;
     }
 }
 
@@ -1647,12 +1655,16 @@ body.sidebar-open .menu-toggle{
     .menu-toggle i {
         font-size: 18px;
     }
+
+    .main-content{
+        padding: 16px 40px 32px;
+    }
 }
 
 .top-search-container{
     display: flex;
     justify-content: center;
-    margin-bottom: 10%;
+    margin-bottom: 5%;
     align-items: flex-end;
 }
 

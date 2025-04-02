@@ -23,9 +23,11 @@ class SpotifyController extends Controller
 
     public function __construct()
     {
-        $this->client = new \GuzzleHttp\Client();
-        $this->client_id = '95e10ffab7914e01905037fad9a2cb4e';
-        $this->client_secret = 'b4d93711efc643c5a092ece5e32e4598';
+        $this->client = new \GuzzleHttp\Client([
+            'verify' => false // Pour le développement uniquement
+        ]);
+        $this->client_id = 'a8f2de6dc1014b4a93e817594dd2b9bb';
+        $this->client_secret = '27be8333e70146b697bccc7bb95d2541';
         // Obtenir un token d'accès
         $this->api_token = $this->getSpotifyToken();
         
@@ -62,7 +64,7 @@ class SpotifyController extends Controller
                 'headers' => [
                     'Authorization' => 'Basic ' . base64_encode($this->client_id . ':' . $this->client_secret),
                     'Content-Type' => 'application/x-www-form-urlencoded'
-                ]
+                ],
             ]);
             
             $result = json_decode($response->getBody());
@@ -82,10 +84,16 @@ class SpotifyController extends Controller
             // Récupérer les albums suggérés pour la section "Nouveautés"
             $suggestedAlbums = $this->getSuggestedAlbums();
             
+            // Récupérer les playlists de l'utilisateur et les playlists suggérées
+            $userPlaylists = $this->getUserPlaylists(4);
+            $suggestedPlaylists = $this->getSuggestedPlaylists(4);
+            
+            // IMPORTANT: Changer le chemin de la vue selon votre structure
             return view('pages.home', [
-
                 'userProgress' => $this->user_progress,
-                'suggestedAlbums' => $suggestedAlbums
+                'suggestedAlbums' => $suggestedAlbums,
+                'userPlaylists' => $userPlaylists,
+                'suggestedPlaylists' => $suggestedPlaylists
             ]);
         } catch (\Exception $e) {
             error_log('Erreur page accueil: ' . $e->getMessage());
@@ -170,30 +178,362 @@ class SpotifyController extends Controller
      */
     private function getUserPlaylists($limit = 4)
     {
-        // Dans une application réelle, on récupérerait les playlists de l'utilisateur via l'API
-        // Mais pour cette démo, on va utiliser des données statiques similaires à l'écran 1
-        $playlists = [];
-        
-        // Images pour les playlists en fonction du design de la deuxième capture d'écran
+        // Liste des images pour les playlists de l'utilisateur
         $images = [
-            '/img/covers/playlist-1.jpg',
-            '/img/covers/playlist-2.jpg',
-            '/img/covers/playlist-3.jpg',
-            '/img/covers/playlist-4.jpg'
+            '/img/playlist-1.png',
+            '/img/playlist-2.png',
+            '/img/playlist-7.png',
+            '/img/playlist-3.png',
+            '/img/playlist-4.png',
+            '/img/playlist-5.png',
+            '/img/playlist-6.png',
+            '/img/playlist-8.png'
         ];
         
-        for ($i = 1; $i <= $limit; $i++) {
+        $names = [
+            'Mes hits du moment',
+            'Concentration',
+            'Soirée Summer',
+            'Running Motivation',
+            'Chill & Relax',
+            'Hip-Hop Français',
+            'Électro Dance',
+            'Classics'
+        ];
+        
+        $descriptions = [
+            'Les titres que j\'écoute en boucle actuellement',
+            'Musique parfaite pour travailler et rester concentré',
+            'Playlist idéale pour l\'été et les soirées entre amis',
+            'Motivation garantie pour vos séances de sport',
+            'Ambiance détendue pour se relaxer',
+            'Le meilleur du hip-hop français',
+            'Sons électro parfaits pour danser',
+            'Les grands classiques intemporels'
+        ];
+        
+        $playlists = [];
+        for ($i = 0; $i < min($limit, count($images)); $i++) {
+            $trackCount = mt_rand(15, 50);
             $playlists[] = new Playlist(
-                'playlist-' . $i,
-                'Playlist ' . $i,
-                'Ma playlist numéro ' . $i,
+                'user-playlist-' . ($i + 1),
+                $names[$i],
+                $descriptions[$i],
                 'Hugo',
-                $images[$i-1],
-                mt_rand(10, 100)
+                $images[$i],
+                $trackCount
             );
         }
         
         return $playlists;
+    }
+
+    /**
+     * Récupère les playlists suggérées pour l'utilisateur
+     */
+    private function getSuggestedPlaylists($limit = 4)
+    {
+        try {
+            // Essayer de récupérer les playlists mises en avant via l'API
+            $response = $this->client->request('GET', 'https://api.spotify.com/v1/browse/featured-playlists?limit=' . $limit, [
+                'headers' => [
+                    'Authorization' => 'Bearer ' . $this->api_token,
+                    'Accept' => 'application/json',
+                ]
+            ]);
+
+            $res = $response->getBody();
+            $objPlaylists = json_decode($res);
+            
+            $suggestedPlaylists = [];
+            foreach ($objPlaylists->playlists->items as $playlist) {
+                $suggestedPlaylists[] = new Playlist(
+                    $playlist->id,
+                    $playlist->name,
+                    $playlist->description ?? '',
+                    $playlist->owner->display_name,
+                    $playlist->images[0]->url,
+                    $playlist->tracks->total
+                );
+            }
+            
+            return $suggestedPlaylists;
+        } catch (\Exception $e) {
+            error_log('Erreur API Spotify (getSuggestedPlaylists): ' . $e->getMessage());
+            
+            // En cas d'erreur, utiliser des données de substitution
+            $images = [
+                '/img/playlist-4.png',
+                '/img/playlist-5.png', 
+                '/img/playlist-6.png',
+                '/img/playlist-8.png'
+            ];
+            
+            $names = [
+                'Découvertes de la semaine',
+                'Hit Parade 2024',
+                'Viral Hits',
+                'Ambiance Chill'
+            ];
+            
+            $descriptions = [
+                'Nouvelles sorties adaptées à vos goûts',
+                'Les titres les plus écoutés du moment',
+                'Les hits qui font le buzz sur les réseaux',
+                'Une ambiance détendue pour se relaxer'
+            ];
+            
+            $suggestedPlaylists = [];
+            for ($i = 0; $i < min($limit, count($images)); $i++) {
+                $trackCount = mt_rand(15, 50);
+                $suggestedPlaylists[] = new Playlist(
+                    'suggested-playlist-' . ($i + 1),
+                    $names[$i],
+                    $descriptions[$i],
+                    'Spotify',
+                    $images[$i],
+                    $trackCount
+                );
+            }
+            
+            return $suggestedPlaylists;
+        }
+    }
+
+    /**
+     * Génère une liste de pistes simulées pour une playlist
+     */
+    private function generatePlaylistTracks($count = 20)
+    {
+        $trackNames = [
+            'Bohemian Rhapsody', 'Imagine', 'Billie Jean', 'Hotel California', 'Sweet Child O\' Mine',
+            'Smells Like Teen Spirit', 'Yesterday', 'Let It Be', 'Purple Haze', 'Like a Rolling Stone',
+            'Stairway to Heaven', 'I Want to Hold Your Hand', 'Hey Jude', 'My Generation', 'Respect',
+            'Johnny B. Goode', 'Good Vibrations', 'London Calling', 'What\'s Going On', 'Waterloo Sunset',
+            'God Save the Queen', 'Gimme Shelter', 'Superstition', 'Blitzkrieg Bop', 'Heroes',
+            'Born to Run', 'I Wanna Be Sedated', 'Anarchy in the U.K.', 'Thriller', 'Sweet Dreams'
+        ];
+        
+        $artistNames = [
+            'Queen', 'John Lennon', 'Michael Jackson', 'Eagles', 'Guns N\' Roses',
+            'Nirvana', 'The Beatles', 'The Beatles', 'Jimi Hendrix', 'Bob Dylan',
+            'Led Zeppelin', 'The Beatles', 'The Beatles', 'The Who', 'Aretha Franklin',
+            'Chuck Berry', 'The Beach Boys', 'The Clash', 'Marvin Gaye', 'The Kinks',
+            'Sex Pistols', 'The Rolling Stones', 'Stevie Wonder', 'Ramones', 'David Bowie',
+            'Bruce Springsteen', 'Ramones', 'Sex Pistols', 'Michael Jackson', 'Eurythmics'
+        ];
+        
+        $albumNames = [
+            'A Night at the Opera', 'Imagine', 'Thriller', 'Hotel California', 'Appetite for Destruction',
+            'Nevermind', 'Help!', 'Let It Be', 'Are You Experienced', 'Highway 61 Revisited',
+            'Led Zeppelin IV', 'Meet the Beatles!', 'Let It Be', 'My Generation', 'I Never Loved a Man the Way I Love You',
+            'Chuck Berry Is on Top', 'Pet Sounds', 'London Calling', 'What\'s Going On', 'Something Else',
+            'Never Mind the Bollocks', 'Let It Bleed', 'Talking Book', 'Ramones', 'Heroes',
+            'Born to Run', 'Road to Ruin', 'Never Mind the Bollocks', 'Thriller', 'Sweet Dreams'
+        ];
+        
+        $tracks = [];
+        
+        // Utiliser seulement les $count premiers éléments des tableaux
+        $count = min($count, count($trackNames));
+        
+        for ($i = 0; $i < $count; $i++) {
+            // Durée aléatoire entre 2:30 et 5:00
+            $durationMs = rand(150, 300) * 1000;
+            
+            $tracks[] = new Track(
+                'track-' . ($i + 1),
+                $trackNames[$i],
+                $artistNames[$i],
+                'artist-' . ($i + 1),
+                $durationMs,
+                null,
+                '/img/covers/album' . (($i % 4) + 1) . '.jpg',
+                $albumNames[$i],
+                'album-' . ($i + 1)
+            );
+        }
+        
+        return $tracks;
+    }
+
+    /**
+     * Affiche les détails d'une playlist
+     */
+    public function playlistDetails($id)
+    {
+        try {
+            // Essayer de récupérer les détails de la playlist via l'API
+            if (strpos($id, 'user-playlist-') === 0) {
+                // C'est une playlist de l'utilisateur
+                $userPlaylists = $this->getUserPlaylists(8);
+                foreach ($userPlaylists as $playlist) {
+                    if ($playlist->getId() === $id) {
+                        // Générer des pistes simulées pour la playlist
+                        $tracks = $this->generatePlaylistTracks($playlist->getTracksCount());
+                        
+                        // Calculer la durée totale
+                        $totalMs = 0;
+                        foreach ($tracks as $track) {
+                            // Vérifier si la méthode getDurationMs existe, sinon utiliser la durée en propriété
+                            if (method_exists($track, 'getDurationMs')) {
+                                $totalMs += $track->getDurationMs();
+                            } else if (property_exists($track, 'duration_ms')) {
+                                $totalMs += $track->duration_ms;
+                            } else {
+                                // Durée par défaut si aucune méthode ou propriété n'est disponible
+                                $totalMs += 210000; // 3:30 minutes par défaut
+                            }
+                        }
+                        
+                        // Formater la durée totale
+                        $hours = floor($totalMs / 3600000);
+                        $minutes = floor(($totalMs % 3600000) / 60000);
+                        
+                        if ($hours > 0) {
+                            $totalDuration = $hours . ' h ' . $minutes . ' min';
+                        } else {
+                            $totalDuration = $minutes . ' min';
+                        }
+                        
+                        // Ajouter des points SPOT'VIP pour consulter une playlist
+                        $this->user_progress->addPoints(5, 'Consultation de playlist');
+                        
+                        return view('pages.playlist-details', [
+                            'playlist' => $playlist,
+                            'tracks' => $tracks,
+                            'totalDuration' => $totalDuration,
+                            'userProgress' => $this->user_progress
+                        ]);
+                    }
+                }
+            } else if (strpos($id, 'suggested-playlist-') === 0) {
+                // C'est une playlist suggérée
+                $suggestedPlaylists = $this->getSuggestedPlaylists(8);
+                foreach ($suggestedPlaylists as $playlist) {
+                    if ($playlist->getId() === $id) {
+                        // Générer des pistes simulées pour la playlist
+                        $tracks = $this->generatePlaylistTracks($playlist->getTracksCount());
+                        
+                        // Calculer la durée totale
+                        $totalMs = 0;
+                        foreach ($tracks as $track) {
+                            // Vérifier si la méthode getDurationMs existe, sinon utiliser la durée en propriété
+                            if (method_exists($track, 'getDurationMs')) {
+                                $totalMs += $track->getDurationMs();
+                            } else if (property_exists($track, 'duration_ms')) {
+                                $totalMs += $track->duration_ms;
+                            } else {
+                                // Durée par défaut si aucune méthode ou propriété n'est disponible
+                                $totalMs += 210000; // 3:30 minutes par défaut
+                            }
+                        }
+                        
+                        // Formater la durée totale
+                        $hours = floor($totalMs / 3600000);
+                        $minutes = floor(($totalMs % 3600000) / 60000);
+                        
+                        if ($hours > 0) {
+                            $totalDuration = $hours . ' h ' . $minutes . ' min';
+                        } else {
+                            $totalDuration = $minutes . ' min';
+                        }
+                        
+                        // Ajouter des points SPOT'VIP pour consulter une playlist
+                        $this->user_progress->addPoints(5, 'Consultation de playlist');
+                        
+                        return view('pages.playlist-details', [
+                            'playlist' => $playlist,
+                            'tracks' => $tracks,
+                            'totalDuration' => $totalDuration,
+                            'userProgress' => $this->user_progress
+                        ]);
+                    }
+                }
+            } else {
+                // C'est une playlist Spotify, on essaie de la récupérer via l'API
+                $response = $this->client->request('GET', 'https://api.spotify.com/v1/playlists/' . $id, [
+                    'headers' => [
+                        'Authorization' => 'Bearer ' . $this->api_token,
+                        'Accept' => 'application/json',
+                    ]
+                ]);
+                
+                $res = $response->getBody();
+                $objPlaylist = json_decode($res);
+                
+                // Créer l'objet Playlist
+                $playlist = new Playlist(
+                    $objPlaylist->id,
+                    $objPlaylist->name,
+                    $objPlaylist->description ?? '',
+                    $objPlaylist->owner->display_name,
+                    $objPlaylist->images[0]->url ?? '/img/covers/playlist-1.jpg',
+                    $objPlaylist->tracks->total
+                );
+                
+                // Récupérer les pistes de la playlist
+                $tracks = [];
+                
+                foreach ($objPlaylist->tracks->items as $item) {
+                    if ($item->track) {
+                        $track = $item->track;
+                        
+                        $tracks[] = new Track(
+                            $track->id,
+                            $track->name,
+                            $track->artists[0]->name,
+                            $track->artists[0]->id,
+                            $track->duration_ms,
+                            $track->preview_url,
+                            $track->album->images[0]->url ?? null,
+                            $track->album->name,
+                            $track->album->id
+                        );
+                    }
+                }
+                
+                // Calculer la durée totale
+                $totalMs = 0;
+                foreach ($tracks as $track) {
+                    // Vérifier si la méthode getDurationMs existe, sinon utiliser la durée en propriété
+                    if (method_exists($track, 'getDurationMs')) {
+                        $totalMs += $track->getDurationMs();
+                    } else if (property_exists($track, 'duration_ms')) {
+                        $totalMs += $track->duration_ms;
+                    } else {
+                        // Durée par défaut si aucune méthode ou propriété n'est disponible
+                        $totalMs += 210000; // 3:30 minutes par défaut
+                    }
+                }
+                
+                // Formater la durée totale
+                $hours = floor($totalMs / 3600000);
+                $minutes = floor(($totalMs % 3600000) / 60000);
+                
+                if ($hours > 0) {
+                    $totalDuration = $hours . ' h ' . $minutes . ' min';
+                } else {
+                    $totalDuration = $minutes . ' min';
+                }
+                
+                // Ajouter des points SPOT'VIP pour consulter une playlist
+                $this->user_progress->addPoints(5, 'Consultation de playlist');
+                
+                return view('pages.playlist-details', [
+                    'playlist' => $playlist,
+                    'tracks' => $tracks,
+                    'totalDuration' => $totalDuration,
+                    'userProgress' => $this->user_progress
+                ]);
+            }
+            
+            // Si on arrive ici, c'est que la playlist n'a pas été trouvée
+            return view('pages.error', ['message' => 'Playlist introuvable.']);
+        } catch (\Exception $e) {
+            error_log('Erreur lors de la récupération des détails de la playlist: ' . $e->getMessage());
+            return view('pages.error', ['message' => 'Impossible de charger les détails de cette playlist.']);
+        }
     }
 
     /**
@@ -349,388 +689,300 @@ class SpotifyController extends Controller
         }
     }
 
-    /**
-     * Affiche les détails d'une piste
-     */
-    public function trackDetails($id)
+    public function profile()
     {
-        try {
-            // Appel à l'API Spotify pour obtenir les détails de la piste
-            $response = $this->client->request('GET', 'https://api.spotify.com/v1/tracks/' . $id, [
-                'headers' => [
-                    'Authorization' => 'Bearer ' . $this->api_token,
-                    'Accept' => 'application/json',
-                ]
-            ]);
+        // Créer des playlists fictives pour la page de profil
+        $userPlaylists = [];
+        $images = [
+            '/img/playlist-1.png',
+            '/img/playlist-2.png',
+            '/img/playlist-3.png',
+            '/img/playlist-7.png'
+        ];
 
-            $res = $response->getBody();
-            $objTrack = json_decode($res);
+        for ($i = 1; $i <= 4; $i++) {
+            $userPlaylists[] = new Playlist(
+                'playlist-' . $i,
+                'Playlist ' . $i,
+                'Ma playlist numéro ' . $i,
+                'Hugo',
+                $images[$i-1],
+                mt_rand(10, 100)
+            );
+        }
+
+        return view('pages.profile', [
+            'userProgress' => $this->user_progress,
+            'userPlaylists' => $userPlaylists
+        ]);
+    }
+    /**
+ * Affiche les résultats de recherche ou la page d'exploration si aucune requête n'est spécifiée
+ * 
+ * @param Request $request
+ * @return \Illuminate\View\View
+ */
+public function search(Request $request)
+{
+    $query = $request->input('q', '');
+    
+    if (!empty($query)) {
+        try {
+            // Initialiser les tableaux de résultats
+            $results = [
+                'tracks' => [],
+                'artists' => [],
+                'albums' => [],
+                'playlists' => []
+            ];
             
-            // Récupérer les features audio de la piste (danceability, energy, etc.)
-            $audioFeaturesResponse = $this->client->request('GET', 'https://api.spotify.com/v1/audio-features/' . $id, [
+            // Effectuer la recherche via l'API Spotify
+            $response = $this->client->request('GET', 'https://api.spotify.com/v1/search', [
                 'headers' => [
                     'Authorization' => 'Bearer ' . $this->api_token,
                     'Accept' => 'application/json',
-                ]
+                ],
+                'query' => [
+                    'q' => $query,
+                    'type' => 'track,artist,album,playlist',
+                    'limit' => 10
+                ],
+                'verify' => false // Pour environnement de développement uniquement - À retirer en production
             ]);
             
-            $audioFeaturesRes = $audioFeaturesResponse->getBody();
-            $objAudioFeatures = json_decode($audioFeaturesRes);
+            $data = json_decode($response->getBody(), true);
             
-            // Récupérer les détails de l'album
-            $albumResponse = $this->client->request('GET', 'https://api.spotify.com/v1/albums/' . $objTrack->album->id, [
-                'headers' => [
-                    'Authorization' => 'Bearer ' . $this->api_token,
-                    'Accept' => 'application/json',
-                ]
-            ]);
-            
-            $albumRes = $albumResponse->getBody();
-            $objAlbum = json_decode($albumRes);
-            
-            // Convertir la date de sortie en français
-            $frDate = Carbon::parse($objAlbum->release_date)->locale('fr')->translatedFormat('d F Y');
-            
-            // Récupérer les artistes
-            $artists = [];
-            foreach ($objTrack->artists as $artist) {
-                $artists[] = $artist->name;
+            // Traiter les pistes
+            if (isset($data['tracks']['items'])) {
+                foreach ($data['tracks']['items'] as $item) {
+                    $results['tracks'][] = new Track(
+                        $item['id'],
+                        $item['name'],
+                        $item['artists'][0]['name'],
+                        $item['artists'][0]['id'],
+                        $item['duration_ms'],
+                        $item['preview_url'] ?? null,
+                        isset($item['album']['images'][0]) ? $item['album']['images'][0]['url'] : null,
+                        $item['album']['name'],
+                        $item['album']['id']
+                    );
+                }
             }
             
-            // Créer l'objet TrackDetails
-            $trackDetails = new TrackDetails(
-                $objTrack->id,
-                $objTrack->name,
-                $artists,
-                $objTrack->album->name,
-                $objTrack->album->id,
-                $frDate,
-                $objTrack->duration_ms,
-                $objTrack->popularity,
-                $objAudioFeatures->danceability,
-                $objAudioFeatures->energy,
-                $objAudioFeatures->tempo,
-                $objAudioFeatures->key,
-                $objAudioFeatures->mode,
-                $objTrack->preview_url,
-                $objTrack->album->images[0]->url
-            );
-            
-            // Ajouter des SPOINTS pour l'écoute (dans un cas réel, vérifier si c'est la première écoute)
-            $this->user_progress->addPoints(1, 'Écoute de titre');
-            
-            return view('pages.track-details', [
-                'trackDetails' => $trackDetails,
-                'userProgress' => $this->user_progress
-            ]);
-        } catch (\Exception $e) {
-            error_log('Erreur API Spotify (trackDetails): ' . $e->getMessage());
-            return view('pages.error', ['message' => 'Impossible de charger les détails de ce titre.']);
-        }
-    }
+            // Pour les artistes dans la recherche API
+                if (isset($data['artists']['items'])) {
+                    foreach ($data['artists']['items'] as $item) {
+                        $artist = new Artist(
+                            $item['id'],
+                            $item['name'],
+                            $item['followers']['total'] ?? 0,
+                            $item['popularity'] ?? rand(50, 95),   // Popularité de l'artiste
+                            $item['genres'] ?? []                  // Genres de l'artiste
+                        );
+                    }
 
-    public function profile()
+                // Créez l'artiste
+                $artist = new Artist($artistId, $artistName, $followers, $popularity, $genres);
+
+                // Définir l'URL de l'image
+                if (!empty($item['images'])) {
+                    try {
+                        $imageUrl = $item['images'][0]['url'];
+                        $artist->setImageUrl($imageUrl);
+                    } catch (\Exception $e) {
+                        // Log l'erreur
+                        error_log("Erreur lors de la définition de l'URL de l'image : " . $e->getMessage());
+                    }
+                }
+
+                $results['artists'][] = $artist;
+            }
+            
+            // Traiter les albums
+            if (isset($data['albums']['items'])) {
+                foreach ($data['albums']['items'] as $item) {
+                    $results['albums'][] = new Album(
+                        $item['id'],
+                        $item['name'],
+                        $item['artists'][0]['name'],
+                        $item['artists'][0]['id'],
+                        $item['release_date'],
+                        $item['total_tracks'],
+                        isset($item['images'][0]) ? $item['images'][0]['url'] : null
+                    );
+                }
+            }
+            
+            // Traiter les playlists
+            if (isset($data['playlists']['items'])) {
+                foreach ($data['playlists']['items'] as $item) {
+                    $results['playlists'][] = new Playlist(
+                        $item['id'],
+                        $item['name'],
+                        $item['description'] ?? '',
+                        $item['owner']['display_name'],
+                        isset($item['images'][0]) ? $item['images'][0]['url'] : null,
+                        $item['tracks']['total']
+                    );
+                }
+            }
+            
+            // Ajouter des points SPOT'VIP pour une recherche
+            $this->user_progress->addPoints(1, 'Recherche effectuée');
+            
+            return view('pages.search', [
+                'query' => $query,
+                'results' => $results,
+                'userProgress' => $this->user_progress,
+                'genres' => []
+            ]);
+            
+        } catch (\Exception $e) {
+            // Log l'erreur
+            error_log('Erreur API Spotify (search): ' . $e->getMessage());
+            
+            // Utiliser des données de substitution en cas d'erreur
+            $results = $this->getFallbackSearchResults($query);
+            
+            return view('pages.search', [
+                'query' => $query,
+                'results' => $results,
+                'userProgress' => $this->user_progress,
+                'genres' => []
+            ]);
+        }
+    } else {
+        // Si aucune requête n'est spécifiée, afficher la page d'exploration avec les genres
+        $genres = $this->getMusicGenres();
+        
+        return view('pages.search', [
+            'query' => '',
+            'results' => [],
+            'userProgress' => $this->user_progress,
+            'genres' => $genres
+        ]);
+    }
+}
+
+/**
+ * Récupère une liste de genres musicaux
+ * 
+ * @return array
+ */
+private function getMusicGenres()
 {
-    // Créer des playlists fictives pour la page de profil
-    $userPlaylists = [];
-   $images = [
-        '/img/playlist-1.png',
-        '/img/playlist-2.png',
-        '/img/playlist-3.png',
-        '/img/playlist-7.png'
+    try {
+        $response = $this->client->request('GET', 'https://api.spotify.com/v1/browse/categories', [
+            'headers' => [
+                'Authorization' => 'Bearer ' . $this->api_token,
+                'Accept' => 'application/json',
+            ],
+            'query' => [
+                'limit' => 40,
+                'locale' => 'fr_FR'
+            ],
+            'verify' => false // Pour environnement de développement uniquement - À retirer en production
+        ]);
+        
+        $data = json_decode($response->getBody(), true);
+        
+        $genres = [];
+        if (isset($data['categories']['items'])) {
+            foreach ($data['categories']['items'] as $category) {
+                $genres[] = $category['name'];
+            }
+        }
+        
+        return $genres;
+        
+    } catch (\Exception $e) {
+        error_log('Erreur API Spotify (getMusicGenres): ' . $e->getMessage());
+        
+        // Liste de genres par défaut en cas d'erreur
+        return [
+            'Pop', 'Hip-Hop', 'Rock', 'Dance / Électro', 'R&B', 'Indie', 
+            'Jazz', 'Métal', 'Classique', 'Reggae', 'Soul', 'Funk', 
+            'Country', 'Folk', 'Blues', 'Punk', 'Latino', 'Rap français',
+            'Chanson française', 'K-pop', 'J-pop', 'Ambient', 'Chill',
+            'Workout', 'Gaming', 'Party', 'Focus', 'Sleep', 'Afro'
+        ];
+    }
+}
+
+/**
+ * Génère des résultats de recherche de substitution en cas d'erreur API
+ * 
+ * @param string $query
+ * @return array
+ */
+private function getFallbackSearchResults($query)
+{
+    $results = [
+        'tracks' => [],
+        'artists' => [],
+        'albums' => [],
+        'playlists' => []
     ];
     
-    for ($i = 1; $i <= 4; $i++) {
-        $userPlaylists[] = new Playlist(
-            'playlist-' . $i,
-            'Playlist ' . $i,
-            'Ma playlist numéro ' . $i,
-            'Hugo',
-            $images[$i-1],
-            mt_rand(10, 100)
+    // Générer des titres simulés
+    for ($i = 0; $i < 5; $i++) {
+        $trackName = "Titre " . ($i + 1) . " (" . $query . ")";
+        $artistName = "Artiste " . ($i + 1);
+        $albumName = "Album " . ($i + 1);
+        $durationMs = rand(180000, 300000); // Entre 3 et 5 minutes
+        
+        $results['tracks'][] = new Track(
+            'track-' . ($i + 1),
+            $trackName,
+            $artistName,
+            'artist-' . ($i + 1),
+            $durationMs,
+            null,
+            '/img/covers/album' . (($i % 4) + 1) . '.jpg',
+            $albumName,
+            'album-' . ($i + 1)
         );
     }
     
-    return view('pages.profile', [
-        'userProgress' => $this->user_progress,
-        'userPlaylists' => $userPlaylists
-    ]);
+    // Générer des artistes simulés
+    for ($i = 0; $i < 4; $i++) {
+        $artist = new Artist(
+            'artist-' . ($i + 1),                      // id
+            "Artiste " . ($i + 1) . " (" . $query . ")", // name
+            rand(10000, 1000000),                      // followers
+            rand(50, 95),                              // popularity (entre 50 et 95)
+            ['Pop', 'Rock', 'Hip-Hop']    // genres (un genre aléatoire)
+        );
+        
+        $artist->setImageUrl('/img/artist-' . (($i % 4) + 1) . '.jpg');
+        
+        $results['artists'][] = $artist;
+    }
+    // Générer des albums simulés
+    for ($i = 0; $i < 6; $i++) {
+        $results['albums'][] = new Album(
+            'album-' . ($i + 1),
+            "Album " . ($i + 1) . " (" . $query . ")",
+            "Artiste " . ($i % 4 + 1),
+            'artist-' . ($i % 4 + 1),
+            date('Y-m-d', strtotime('-' . rand(1, 365) . ' days')),
+            rand(8, 16),
+            '/img/covers/album' . (($i % 4) + 1) . '.jpg'
+        );
+    }
+    
+    // Générer des playlists simulées
+    for ($i = 0; $i < 4; $i++) {
+        $results['playlists'][] = new Playlist(
+            'playlist-' . ($i + 1),
+            "Playlist " . ($i + 1) . " " . $query,
+            "Une playlist avec des titres liés à " . $query,
+            "Utilisateur " . ($i + 1),
+            '/img/playlist-' . (($i % 8) + 1) . '.png',
+            rand(15, 100)
+        );
+    }
+    
+    return $results;
 }
-    /**
-     * Affiche les détails d'un album
-     */
-    public function albumDetails($id)
-    {
-        try {
-            // Appel à l'API Spotify pour obtenir les détails de l'album
-            $response = $this->client->request('GET', 'https://api.spotify.com/v1/albums/' . $id, [
-                'headers' => [
-                    'Authorization' => 'Bearer ' . $this->api_token,
-                    'Accept' => 'application/json',
-                ]
-            ]);
-
-            $res = $response->getBody();
-            $objAlbum = json_decode($res);
-            
-            // Convertir la date de sortie en français
-            $frDate = Carbon::parse($objAlbum->release_date)->locale('fr')->translatedFormat('d F Y');
-            
-            // Récupérer l'artiste principal
-            $artistName = $objAlbum->artists[0]->name;
-            $artistId = $objAlbum->artists[0]->id;
-            
-            // Créer l'objet Album complet
-            $albumDetails = new Album(
-                $objAlbum->id,
-                $objAlbum->name,
-                $artistName,
-                $artistId,
-                $frDate,
-                $objAlbum->total_tracks,
-                $objAlbum->images[0]->url,
-                $objAlbum->tracks->items ?? [],
-                $objAlbum->popularity,
-                $objAlbum->genres ?? [],
-                $objAlbum->label ?? '',
-                $objAlbum->copyrights[0]->text ?? ''
-            );
-            
-            // Ajouter des SPOINTS pour la consultation d'album
-            $this->user_progress->addPoints(25, 'Consultation d\'album');
-            
-            return view('pages.album-details', [
-                'albumDetails' => $albumDetails,
-                'userProgress' => $this->user_progress
-            ]);
-        } catch (\Exception $e) {
-            error_log('Erreur API Spotify (albumDetails): ' . $e->getMessage());
-            return view('pages.error', ['message' => 'Impossible de charger les détails de cet album.']);
-        }
-    }
-
-    /**
-     * Recherche dans Spotify
-     */
-    public function search(Request $request)
-    {
-        $query = $request->input('q', '');
-        $results = [];
-        
-        if ($query) {
-            try {
-                $response = $this->client->request('GET', 'https://api.spotify.com/v1/search', [
-                    'headers' => [
-                        'Authorization' => 'Bearer ' . $this->api_token,
-                        'Accept' => 'application/json',
-                    ],
-                    'query' => [
-                        'q' => $query,
-                        'type' => 'album,artist,track,playlist',
-                        'limit' => 5
-                    ]
-                ]);
-
-                $res = $response->getBody();
-                $objResults = json_decode($res);
-                
-                // Transformer les résultats en objets de nos modèles
-                $results = [
-                    'tracks' => $this->transformTracks($objResults->tracks->items ?? []),
-                    'albums' => $this->transformAlbums($objResults->albums->items ?? []),
-                    'artists' => $this->transformArtists($objResults->artists->items ?? []),
-                    'playlists' => $this->transformPlaylists($objResults->playlists->items ?? [])
-                ];
-                
-                // Ajouter des SPOINTS pour la recherche
-                $this->user_progress->addPoints(5, 'Recherche effectuée');
-            } catch (\Exception $e) {
-                error_log('Erreur API Spotify (search): ' . $e->getMessage());
-                $results = [];
-            }
-        }
-        
-        return view('pages.search', [
-            'query' => $query,
-            'results' => $results,
-            'genres' => $this->getGenresList(),
-            'userProgress' => $this->user_progress
-        ]);
-    }
-    
-    /**
-     * Transformation des pistes depuis l'API
-     */
-    private function transformTracks($tracks)
-    {
-        $transformed = [];
-        foreach ($tracks as $track) {
-            $transformed[] = new Track(
-                $track->id,
-                $track->name,
-                $track->artists[0]->name,
-                $track->artists[0]->id,
-                $track->duration_ms,
-                $track->preview_url,
-                $track->album->images[0]->url ?? null,
-                $track->album->name,
-                $track->album->id
-            );
-        }
-        return $transformed;
-    }
-    
-    /**
-     * Transformation des albums depuis l'API
-     */
-    private function transformAlbums($albums)
-    {
-        $transformed = [];
-        foreach ($albums as $album) {
-            // Convertir la date en français
-            $frDate = Carbon::parse($album->release_date)->locale('fr')->translatedFormat('d F Y');
-            
-            $transformed[] = new Album(
-                $album->id,
-                $album->name,
-                $album->artists[0]->name,
-                $album->artists[0]->id,
-                $frDate,
-                $album->total_tracks,
-                $album->images[0]->url ?? null
-            );
-        }
-        return $transformed;
-    }
-    
-    /**
-     * Transformation des artistes depuis l'API
-     */
-    private function transformArtists($artists)
-    {
-        $transformed = [];
-        foreach ($artists as $artist) {
-            $transformed[] = new Artist(
-                $artist->id,
-                $artist->name,
-                $artist->followers->total,
-                $artist->popularity,
-                $artist->genres ?? [],
-                $artist->images[0]->url ?? null
-            );
-        }
-        return $transformed;
-    }
-    
-    /**
-     * Transformation des playlists depuis l'API
-     */
-    private function transformPlaylists($playlists)
-    {
-        $transformed = [];
-        foreach ($playlists as $playlist) {
-            $transformed[] = new Playlist(
-                $playlist->id,
-                $playlist->name,
-                $playlist->description ?? '',
-                $playlist->owner->display_name,
-                $playlist->images[0]->url ?? null,
-                $playlist->tracks->total
-            );
-        }
-        return $transformed;
-    }
-
-    /**
-     * Récupération des genres
-     */
-    private function getGenresList()
-    {
-        try {
-            $response = $this->client->request('GET', 'https://api.spotify.com/v1/recommendations/available-genre-seeds', [
-                'headers' => [
-                    'Authorization' => 'Bearer ' . $this->api_token,
-                    'Accept' => 'application/json',
-                ]
-            ]);
-            
-            $res = $response->getBody();
-            $genres = json_decode($res)->genres;
-            return $genres;
-        } catch (\Exception $e) {
-            error_log('Erreur récupération genres: ' . $e->getMessage());
-            return [
-                'Pop', 'Rock', 'Hip-Hop', 'R&B', 'Electronic', 'Dance', 
-                'Jazz', 'Classical', 'Country', 'Folk', 'Metal', 'Punk', 
-                'Indie', 'Alternative', 'Reggae', 'Blues', 'Soul'
-            ];
-        }
-    }
-
-    /**
-     * Ajouter des points SPOT'VIP
-     */
-    public function addPoints(Request $request)
-    {
-        $action = $request->input('action');
-        $points = $request->input('points', 0);
-        
-        $this->user_progress->addPoints($points, $action);
-        
-        return redirect()->back()->with('message', "Vous avez gagné $points SPOINTS pour l'action : $action");
-    }
-    
-    /**
-     * Simuler des actions pour gagner des points (pour la démonstration)
-     */
-    public function simulateAction(Request $request, $action)
-    {
-        $points = 0;
-        $actionLabel = '';
-        
-        // Points attribués en fonction de la stratégie marketing SPOT'VIP
-        switch ($action) {
-            case 'listen':
-                $points = 1;  // 1 SPOINT par heure d'écoute
-                $actionLabel = 'Écoute de musique (1 heure)';
-                break;
-            case 'playlist':
-                $points = 50; // 50 SPOINTS par playlist créée et partagée
-                $actionLabel = 'Création et partage d\'une playlist';
-                break;
-            case 'preview':
-                $points = 100; // 100 SPOINTS pour écoute d'album en avant-première
-                $actionLabel = 'Écoute d\'un album en avant-première';
-                break;
-            case 'event':
-                $points = 200; // 200 SPOINTS pour participation à un événement
-                $actionLabel = 'Participation à un événement Spotify';
-                break;
-            case 'interaction':
-                $points = mt_rand(25, 50); // 25 à 50 SPOINTS par interaction avec un artiste
-                $actionLabel = 'Interaction avec un artiste';
-                break;
-            default:
-                $points = 5;
-                $actionLabel = 'Action générique';
-        }
-        
-        $this->user_progress->addPoints($points, $actionLabel);
-        
-        return redirect()->back()->with('success', "Vous avez gagné $points SPOINTS pour l'action : $actionLabel");
-    }
-    
-    /**
-     * Page de bibliothèque (simplifiée pour la démo)
-     */
-    public function library()
-    {
-        return view('pages.library', [
-            'userPlaylists' => $this->getUserPlaylists(8),
-            'userFavorites' => $this->getUserFavorites(),
-            'results' => [],
-            'genres' => ['Pop', 'Hip Hop', 'Rock', 'Électronique', 'R&B', 'Indie', 'Jazz', 'Classique'],
-            'userProgress' => $this->user_progress
-        ]);
-    }
 }

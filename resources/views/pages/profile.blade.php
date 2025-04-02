@@ -37,13 +37,18 @@
     <div class="profile-content">
         <!-- Playlists -->
         <div class="profile-section">
-            <h2 class="section-title">MES PLAYLISTS</h2>
+            <h2 class="section-title" style="color: var(--spotify-green);">MES PLAYLISTS</h2>
             <div class="playlists-container">
                 @foreach($userPlaylists as $playlist)
                 <div class="playlist-item">
                     <div class="playlist-cover">
                         <img src="{{ $playlist->getImageUrl() }}" alt="{{ $playlist->getName() }}">
+                        <button class="play-btn-overlay">
+                            <i class="fas fa-play"></i>
+                        </button>
                     </div>
+                    <h4 class="playlist-name">Playlist 1</h4>
+                    <p style="margin-left: 10px;">Par Hugo</p>
                 </div>
                 @endforeach
             </div>
@@ -51,7 +56,7 @@
         
         <!-- Badges -->
         <div class="profile-section badges-section">
-            <h2 class="section-title">MES BADGES</h2>
+            <h2 class="section-title" style="color: var(--spotify-green);">MES BADGES</h2>
             <div class="badges-container">
                 <div class="badge-grid">
                     <div class="badge-item">
@@ -78,7 +83,7 @@
         
         <!-- Mix -->
         <div class="profile-section">
-            <h2 class="section-title">MES MIX</h2>
+            <h2 class="section-title" style="color: var(--spotify-green);">MES MIX</h2>
             <div class="mix-container">
                 @for($i = 1; $i <= 5; $i++)
                 <div class="mix-item">
@@ -206,7 +211,6 @@
     .playlists-container {
         display: flex;
         gap: 15px;
-        overflow-x: auto;
         padding-bottom: 10px;
     }
     
@@ -217,8 +221,37 @@
     .playlist-cover img {
         width: 120px;
         height: 120px;
-        border-radius: 50%;
+        border-radius: 5%;
         object-fit: cover;
+    }
+
+    .play-btn-overlay {
+        position: absolute;
+        bottom: 15px;
+        right: 8px;
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background-color: var(--spotify-green);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: none;
+        color: white;
+        opacity: 0;
+        transition: opacity 0.3s, transform 0.3s;
+        transform: translateY(8px);
+        cursor: pointer;
+    }
+
+    .playlist-cover:hover .play-btn-overlay {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    .playlist-name{
+        font-size: 120%;
+        margin-left: 5px;
     }
     
     /* Badges */

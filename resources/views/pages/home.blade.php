@@ -32,18 +32,18 @@
             <div class="column">
                 <h2 class="section-title spotify-green">Mes playlists</h2>
                 <div class="card-grid">
-                    <div class="content-card">
-                        <img src="/img/playlist-1.png" alt="Ma playlist 1" class="card-cover">
-                    </div>
-                    <div class="content-card">
-                        <img src="/img/playlist-2.png" alt="Ma playlist 2" class="card-cover">
-                    </div>
-                    <div class="content-card">
-                        <img src="/img/playlist-7.png" alt="Ma playlist 3" class="card-cover">
-                    </div>
-                    <div class="content-card">
-                        <img src="/img/playlist-3.png" alt="Ma playlist 4" class="card-cover">
-                    </div>
+                    @foreach($userPlaylists as $playlist)
+                    <a href="{{ route('playlistDetails', ['id' => $playlist->getId()]) }}" class="content-card playlist-link-card">
+                        <img src="{{ $playlist->getImageUrl() }}" alt="{{ $playlist->getName() }}" class="card-cover">
+                        <div class="playlist-info">
+                            <div class="playlist-name">{{ $playlist->getName() }}</div>
+                            <div class="playlist-count">{{ $playlist->getTracksCount() }} titres</div>
+                        </div>
+                        <div class="play-overlay">
+                            <i class="fas fa-play"></i>
+                        </div>
+                    </a>
+                    @endforeach
                 </div>
             </div>
             
@@ -53,18 +53,18 @@
             <div class="column">
                 <h2 class="section-title spotify-green">Playlists suggérées</h2>
                 <div class="card-grid">
-                    <div class="content-card">
-                        <img src="/img/playlist-4.png" alt="Playlist suggérée 1" class="card-cover">
-                    </div>
-                    <div class="content-card">
-                        <img src="/img/playlist-5.png" alt="Playlist suggérée 2" class="card-cover">
-                    </div>
-                    <div class="content-card">
-                        <img src="/img/playlist-6.png" alt="Playlist suggérée 3" class="card-cover">
-                    </div>
-                    <div class="content-card">
-                        <img src="/img/playlist-8.png" alt="Playlist suggérée 4" class="card-cover">
-                    </div>
+                    @foreach($suggestedPlaylists as $playlist)
+                    <a href="{{ route('playlistDetails', ['id' => $playlist->getId()]) }}" class="content-card playlist-link-card">
+                        <img src="{{ $playlist->getImageUrl() }}" alt="{{ $playlist->getName() }}" class="card-cover">
+                        <div class="playlist-info">
+                            <div class="playlist-name">{{ $playlist->getName() }}</div>
+                            <div class="playlist-count">{{ $playlist->getTracksCount() }} titres</div>
+                        </div>
+                        <div class="play-overlay">
+                            <i class="fas fa-play"></i>
+                        </div>
+                    </a>
+                    @endforeach
                 </div>
             </div>
         </div>
@@ -176,17 +176,18 @@
 <style>
     .main-content-inner {
         transition: margin-left 0.3s ease;
+        padding: 0 30px 30px 30px;
     }
     
     /* En-tête avec informations utilisateur */
     .user-welcome {
         margin-bottom: 40px;
+        margin-left: 5vw;
     }
     
     .user-header {
         display: flex;
         justify-content: space-between;
-        align-items: center;
         margin-bottom: 20px;
     }
     
@@ -217,7 +218,6 @@
     /* Barre de progression alignée à gauche */
     .progress-section-left {
         max-width: 500px;
-        margin-left: 75px;
         margin-top: 10px;
     }
     
@@ -265,7 +265,7 @@
     
     .column {
         flex: 1;
-        padding: 0 20px;
+        padding: 0 80px;
     }
     
     .vertical-divider {
@@ -292,62 +292,133 @@
     
     /* Grilles de cartes */
    
-/* Réduire la taille de toutes les cards */
-.card-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 10px; /* Réduit l'espace entre les cartes */
-}
+    /* Réduire la taille de toutes les cards */
+    .card-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 20px; /* Réduit l'espace entre les cartes */
+    }
 
-.content-card {
-    max-width: 140px; /* Limite la largeur maximale */
-    max-height: 180px; /* Limite la hauteur maximale */
-    margin: 0 auto; /* Centre si nécessaire */
-}
+    .content-card {
+        padding: 10px;
+        width: 15vw; /* Limite la largeur maximale */
+        max-width: 250px;
+        max-height: 350px;
+        margin: 0 auto; /* Centre si nécessaire */
+        position: relative;
+        overflow: hidden;
+    }
 
-.card-cover {
-    width: 100%;
-    height: auto;
-    max-height: 140px;
-    object-fit: cover;
-}
+    /* Style pour les cartes de playlists cliquables */
+    .playlist-link-card {
+        cursor: pointer;
+        display: block;
+        text-decoration: none;
+        color: inherit;
+        transition: transform 0.3s ease;
+    }
 
-/* Pour les artistes (images circulaires) */
-.artist-cover {
-    border-radius: 50%;
-}
+    .playlist-link-card:hover {
+        transform: scale(1.05);
+    }
 
-/* Pour les images de mix */
-.mix-cover img {
-    width: 50px;
-    height: 50px;
-    object-fit: cover;
-}
+    .playlist-link-card:hover .play-overlay {
+        opacity: 1;
+        transform: translateY(0);
+    }
 
-/* Pour les images de playlist dans la page profil */
-.playlist-cover img {
-    width: 100px;
-    height: 100px;
-    border-radius: 50%;
-}
+    .playlist-info {
+        padding: 5px 0;
+    }
 
-/* Ajuster la grille des nouveautés */
-.wide-grid {
-    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-    gap: 15px;
-}
+    .playlist-name {
+        font-weight: 500;
+        font-size: 14px;
+        color: var(--spotify-white);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .playlist-count {
+        font-size: 12px;
+        color: var(--spotify-off-white);
+    }
+
+    .play-overlay {
+        position: absolute;
+        bottom: 30%;
+        left: 10%;
+        width: 35px;
+        height: 35px;
+        border-radius: 50%;
+        background-color: var(--spotify-green);
+        color: var(--spotify-black);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        opacity: 0;
+        transform: translateY(10px);
+        transition: opacity 0.3s ease, transform 0.3s ease;
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+    }
+
+    .card-cover {
+        width: 100%;
+        height: auto;
+        object-fit: cover;
+    }
+
+    /* Pour les artistes (images circulaires) */
+    .artist-cover {
+        border-radius: 50%;
+    }
+
+    /* Pour les images de mix */
+    .mix-cover img {
+        width: 50px;
+        height: 50px;
+        object-fit: cover;
+    }
+
+    /* Pour les images de playlist dans la page profil */
+    .playlist-cover img {
+        width: 100px;
+        height: 100px;
+        border-radius: 50%;
+    }
+
+    /* Ajuster la grille des nouveautés */
+    .wide-grid {
+        grid-template-columns: repeat(auto-fill, minmax(20vw, 1fr));
+        gap: 15px;
+    }
     
     /* Responsive */
     @media (max-width: 1024px) {
         .wide-grid {
-            grid-template-columns: repeat(3, 1fr);
+        grid-template-columns: repeat(auto-fill, minmax(16vw, 1fr));
         }
-        
+
         /* Ajustements pour le menu burger en mode tablette */
         body.sidebar-open .main-content-inner {
             opacity: 0.7;
         }
-    }
+
+        .content-card{
+            width: 17vw;
+            max-width: 200px;
+        }
+
+        .column{
+        padding: 0;
+        }
+
+        .user-welcome {
+            margin-left: none;
+        }
+}
+
     
     @media (max-width: 768px) {
         .section-row {
@@ -384,13 +455,19 @@
         .welcome-title {
             font-size: 1.8rem;
         }
+
+        .content-card{
+            width: 30vw;
+        }
     }
     
     @media (max-width: 480px) {
-        .card-grid, .wide-grid {
-            grid-template-columns: 1fr;
+
+        .main-content-inner {
+        transition: margin-left 0.3s ease;
+        padding: 0 0px 30px 0px;
         }
-        
+
         .user-avatar {
             width: 40px;
             height: 40px;
@@ -400,6 +477,44 @@
         .welcome-title {
             font-size: 1.5rem;
         }
+
+        .content-card{
+            width: 45vw; 
+        }
+
+        .card-grid{
+            max-width: 350px;
+            overflow-x: scroll;
+            scrollbar-width: 0px;
+            padding-bottom: 10px
+        }
     }
 </style>
+@endpush
+
+@push('scripts')
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Animation pour les playlists
+        const playlistLinks = document.querySelectorAll('.playlist-link-card');
+        
+        playlistLinks.forEach(link => {
+            link.addEventListener('click', function(e) {
+                // Si on clique sur l'icône de lecture, on empêche la navigation
+                if (e.target.closest('.play-overlay')) {
+                    e.preventDefault();
+                    
+                    const playIcon = e.target.closest('.play-overlay').querySelector('i');
+                    if (playIcon.classList.contains('fa-play')) {
+                        playIcon.classList.remove('fa-play');
+                        playIcon.classList.add('fa-pause');
+                    } else {
+                        playIcon.classList.remove('fa-pause');
+                        playIcon.classList.add('fa-play');
+                    }
+                }
+            });
+        });
+    });
+</script>
 @endpush

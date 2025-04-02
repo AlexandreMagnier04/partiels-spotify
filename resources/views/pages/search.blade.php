@@ -22,7 +22,7 @@
                                     <th>#</th>
                                     <th>Titre</th>
                                     <th>Album</th>
-                                    <th><i class="far fa-clock"></i></th>
+                                    <th style="text-align: end"><i class="far fa-clock"></i></th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -32,6 +32,9 @@
                                     <td>
                                         <div class="track-title-cell">
                                             <img src="{{ $track->getImageUrl() }}" alt="{{ $track->getName() }}" width="40" height="40">
+                                            <button class="play-btn-overlay search">
+                                                <i class="fas fa-play"></i>
+                                            </button>
                                             <div>
                                                 <div><a href="{{ route('trackDetails', ['id' => $track->getId()]) }}">{{ $track->getName() }}</a></div>
                                                 <div class="text-muted">{{ $track->getArtist() }}</div>
@@ -48,11 +51,11 @@
                 </section>
             @endif
             
-            <!-- Artistes -->
+            <!-- Dernières sorties -->
             @if(count($results['artists']) > 0)
                 <section class="section">
                     <div class="section-header">
-                        <h2 class="section-title">Artistes</h2>
+                        <h2 class="section-title">Dernières sorties / Single</h2>
                         <a href="#" class="see-all-link">Voir tout</a>
                     </div>
                     
@@ -61,7 +64,7 @@
                         <div class="grid-item">
                             <div class="card artist-card">
                                 <div class="card-img-container">
-                                    <img src="{{ $artist->getImageUrl() }}" class="card-img artist-img" alt="{{ $artist->getName() }}">
+                                    <img src="{{ !empty($item['images']) ? $item['images'][0]['url'] : '/img/default-artist.jpg' }}" class="card-img artist-img" alt="{{ $artist->getName() }}">
                                 </div>
                                 <h3 class="card-title">{{ $artist->getName() }}</h3>
                                 <p class="card-text">Artiste • {{ $artist->getFormattedFollowers() }} followers</p>
@@ -218,6 +221,7 @@
     .track-title-cell {
         display: flex;
         align-items: center;
+        position: relative;
     }
     
     .track-title-cell img {
@@ -279,7 +283,7 @@
     .play-btn-overlay {
         position: absolute;
         bottom: 8px;
-        right: 8px;
+        left: 8px;
         width: 40px;
         height: 40px;
         border-radius: 50%;
@@ -294,8 +298,16 @@
         transform: translateY(8px);
         cursor: pointer;
     }
+
+    .play-btn-overlay.search{
+        left: 0px;
+        bottom: 10px;
+        width: 30px;
+        height: 30px; 
+    }
     
-    .card:hover .play-btn-overlay {
+    .card:hover .play-btn-overlay,
+    tr:hover .play-btn-overlay.search {
         opacity: 1;
         transform: translateY(0);
     }

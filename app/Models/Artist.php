@@ -63,8 +63,15 @@ class Artist
         return $this->genres;
     }
 
+    private $imageUrl;
+
+    public function setImageUrl($url)
+    {
+        $this->imageUrl = $url;
+    }
+
     public function getImageUrl()
     {
-        return $this->image_url;
+        return $this->imageUrl ?? '/img/default-artist.jpg'; // Retourne une image par défaut si non définie
     }
 }
