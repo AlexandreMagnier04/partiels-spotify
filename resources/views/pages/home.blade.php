@@ -3,27 +3,7 @@
 @section('title', 'Accueil')
 
 @section('content')
-{{-- Cette page a été modifiée pour utiliser vos images spécifiques --}}
-    <!-- Barre de recherche tout en haut centrée -->
-    <div class="top-search-container">
-        <div class="search-buttons">
-            <a href="{{ route('home') }}" class="home-button">
-                <i class="fas fa-home"></i>
-            </a>
-        </div>
-        <form action="{{ route('search') }}" method="GET">
-            <div class="search-input-wrapper">
-                <i class="fas fa-search search-icon"></i>
-                <input type="text" class="search-input" name="q" placeholder="Que souhaitez-vous écouter ?">
-            </div>
-        </form>
-        <a href="{{ route('profile') }}" class="profile-link">
-                <div class="profile-icon">
-                    <i class="fas fa-user"></i>
-                </div>
-            </a>
-    </div>
-<div class="main-content">    
+<div class="main-content-inner">    
     <!-- En-tête avec informations utilisateur -->
     <div class="user-welcome">
         <div class="user-header">
@@ -161,13 +141,13 @@
                         <img src="/img/iam.avif" alt="Artiste suggéré 1" class="card-cover artist-cover">
                     </div>
                     <div class="content-card">
-                        <img src="/img/" alt="Artiste suggéré 2" class="card-cover artist-cover">
+                        <img src="/img/david-guetta.jpeg" alt="Artiste suggéré 2" class="card-cover artist-cover">
                     </div>
                     <div class="content-card">
-                        <img src="/img/" alt="Artiste suggéré 3" class="card-cover artist-cover">
+                        <img src="/img/AT-_-GAZO.jpg" alt="Artiste suggéré 3" class="card-cover artist-cover">
                     </div>
                     <div class="content-card">
-                        <img src="/img/" alt="Artiste suggéré 4" class="card-cover artist-cover">
+                        <img src="/img/gimd.jpg" alt="Artiste suggéré 4" class="card-cover artist-cover">
                     </div>
                 </div>
             </div>
@@ -194,74 +174,8 @@
 
 @push('styles')
 <style>
-    .main-content {
-        padding: 20px 30px;
-    }
-    
-    /* Barre de recherche tout en haut centrée */
-    .top-search-container {
-        display: flex;
-        align-items: center;
-        margin-bottom: 30px;
-        position: relative;
-        justify-content: space-between;
-    }
-    
-    .search-buttons {
-        display: flex;
-        align-items: center;
-    }
-    
-    .home-button {
-        width: 40px;
-        height: 40px;
-        border-radius: 50%;
-        background-color: var(--spotify-dark-gray);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: var(--spotify-white);
-        transition: background-color 0.3s;
-    }
-    
-    .home-button:hover {
-        background-color: var(--spotify-medium-gray);
-        text-decoration: none;
-    }
-    
-    .search-input-wrapper {
-        position: relative;
-        width: 500px;
-        max-width: 90%;
-    }
-    
-    .search-icon {
-        position: absolute;
-        left: 15px;
-        top: 50%;
-        z-index: 10;
-        transform: translateY(-50%);
-        color: var(--spotify-off-white);
-        font-size: 16px;
-    }
-    
-    .search-input {
-        width: 100%;
-        padding: 12px 15px 12px 45px;
-        border-radius: 30px;
-        border: none;
-        background-color: var(--spotify-medium-gray);
-        color: var(--spotify-white);
-        font-size: 14px;
-    }
-    
-    .search-input:focus {
-        outline: none;
-        background-color: var(--spotify-light-gray);
-    }
-    
-    .search-input::placeholder {
-        color: var(--spotify-off-white);
+    .main-content-inner {
+        transition: margin-left 0.3s ease;
     }
     
     /* En-tête avec informations utilisateur */
@@ -293,26 +207,6 @@
         font-weight: bold;
         margin-right: 15px;
         color: white;
-    }
-    
-    .profile-link {
-        text-decoration: none;
-    }
-    
-    .profile-icon {
-        width: 44px;
-        height: 44px;
-        border-radius: 50%;
-        background-color: var(--spotify-dark-gray);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 20px;
-        transition: background-color 0.3s;
-    }
-    
-    .profile-icon:hover {
-        background-color: var(--spotify-medium-gray);
     }
     
     .welcome-title {
@@ -419,9 +313,7 @@
 }
 
 /* Pour les artistes (images circulaires) */
-.artist-card .card-cover {
-    width: 120px;
-    height: 120px;
+.artist-cover {
     border-radius: 50%;
 }
 
@@ -450,6 +342,11 @@
         .wide-grid {
             grid-template-columns: repeat(3, 1fr);
         }
+        
+        /* Ajustements pour le menu burger en mode tablette */
+        body.sidebar-open .main-content-inner {
+            opacity: 0.7;
+        }
     }
     
     @media (max-width: 768px) {
@@ -474,11 +371,34 @@
         .search-input-wrapper {
             max-width: 100%;
         }
+        
+        /* Ajustements pour le menu burger en mode mobile */
+        .progress-section-left {
+            margin-left: 0;
+        }
+        
+        .user-welcome {
+            margin-bottom: 20px;
+        }
+        
+        .welcome-title {
+            font-size: 1.8rem;
+        }
     }
     
     @media (max-width: 480px) {
         .card-grid, .wide-grid {
             grid-template-columns: 1fr;
+        }
+        
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            font-size: 20px;
+        }
+        
+        .welcome-title {
+            font-size: 1.5rem;
         }
     }
 </style>

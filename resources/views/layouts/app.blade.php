@@ -14,9 +14,12 @@
     @stack('styles')
 </head>
 <body>
+    <!-- Overlay pour le menu sur mobile -->
+    <div class="sidebar-overlay"></div>
+    
     <div class="main-container">
         <div class="content-wrapper">
-            <!-- Sidebar -->
+            <!-- Sidebar - maintenant avec la classe pour l'animation -->
             <div class="sidebar">
                 <div class="sidebar-logo">
                     <a href="{{ route('home') }}">
@@ -29,12 +32,6 @@
                         <a href="{{ route('home') }}" class="nav-link {{ request()->routeIs('home') ? 'active' : '' }}">
                             <i class="fas fa-home"></i>
                             <span>Accueil</span>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="{{ route('search', ['q' => '']) }}" class="nav-link {{ request()->routeIs('search') ? 'active' : '' }}">
-                            <i class="fas fa-search"></i>
-                            <span>Rechercher</span>
                         </a>
                     </li>
                     <li class="nav-item">
@@ -71,15 +68,45 @@
                 <div class="playlist-divider"></div>
                 
                 <div class="user-playlists">
-                    <a href="#" class="playlist-link">Playlist 1</a>
-                    <a href="#" class="playlist-link">Playlist 2</a>
-                    <a href="#" class="playlist-link">Playlist 3</a>
-                    <a href="#" class="playlist-link">Playlist 4</a>
+                    <a href="#" class="playlist-link">
+                    <img class="sidebar-playlist" src="img\album-8.png" alt="playlist 1">
+                    <span></span>
+                    </a>
+                    <a href="#" class="playlist-link">
+                    <img class="sidebar-playlist" src="img\album-3.png" alt="playlist 1">
+                    </a>
+                    <a href="#" class="playlist-link">
+                    <img class="sidebar-playlist" src="img\lbum-1.png" alt="playlist 1">
+                    </a>
+                    <a href="#" class="playlist-link">
+                    <img class="sidebar-playlist" src="img\album-7.png" alt="playlist 1">
+                    </a>
                 </div>
             </div>
             
             <!-- Main Content -->
             <div class="main-content">
+                <!-- Barre de recherche avec bouton de menu -->
+                <div class="top-search-container">
+                    <!-- Bouton du menu burger -->
+                    <button id="menu-toggle" class="menu-toggle">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                    
+                    <form action="{{ route('search') }}" method="GET" id="search-form">
+                        <div class="search-input-wrapper">
+                            <i class="fas fa-search search-icon"></i>
+                            <input type="text" class="search-input" name="q" placeholder="Que souhaitez-vous écouter ?" value="{{ $query ?? '' }}" id="search-input">
+                        </div>
+                    </form>
+                    
+                    <a href="{{ route('profile') }}" class="profile-link">
+                        <div class="profile-icon">
+                            <i class="fas fa-user"></i>
+                        </div>
+                    </a>
+                </div>
+                
                 @yield('content')
             </div>
         </div>
@@ -193,6 +220,83 @@
                     this.style.transform = 'scale(1)';
                 });
             });
+            
+            // Script pour le menu burger
+            const menuToggle = document.getElementById('menu-toggle');
+            const sidebar = document.querySelector('.sidebar');
+            const mainContent = document.querySelector('.main-content');
+            const overlay = document.querySelector('.sidebar-overlay');
+            
+            // Fonction pour ouvrir le menu
+            function openSidebar() {
+                sidebar.classList.add('open');
+                overlay.classList.add('active');
+                document.body.classList.add('sidebar-open');
+                
+                // Mémoriser l'état du menu dans le localStorage
+                localStorage.setItem('sidebarState', 'open');
+            }
+            
+            // Fonction pour fermer le menu
+            function closeSidebar() {
+                sidebar.classList.remove('open');
+                overlay.classList.remove('active');
+                document.body.classList.remove('sidebar-open');
+                
+                // Mémoriser l'état du menu dans le localStorage
+                localStorage.setItem('sidebarState', 'closed');
+            }
+            
+            // Écouteur d'événement pour le bouton du menu
+            menuToggle.addEventListener('click', function() {
+                if (sidebar.classList.contains('open')) {
+                    closeSidebar();
+                } else {
+                    openSidebar();
+                }
+            });
+            
+            // Fermer le menu quand on clique sur l'overlay
+            overlay.addEventListener('click', closeSidebar);
+            
+            // Gestion de l'état initial du menu selon la taille de l'écran
+            function handleInitialState() {
+                const savedState = localStorage.getItem('sidebarState');
+                
+                if (window.innerWidth < 1024) {
+                    // Sur mobile et tablette, le menu est fermé par défaut
+                    closeSidebar();
+                } else if (savedState === 'open' || savedState === null) {
+                    // Sur desktop, le menu est ouvert par défaut ou selon la préférence enregistrée
+                    openSidebar();
+                } else {
+                    closeSidebar();
+                }
+            }
+            
+            // Gestion du redimensionnement de l'écran
+            window.addEventListener('resize', function() {
+                if (window.innerWidth < 1024 && sidebar.classList.contains('open')) {
+                    // Ferme automatiquement le menu sur mobile en cas de redimensionnement
+                    closeSidebar();
+                }
+            });
+            
+            // CORRECTION: Gestionnaire pour la barre de recherche
+            const searchInput = document.getElementById('search-input');
+            if (searchInput) {
+                searchInput.addEventListener('click', function(event) {
+                    // Empêcher la soumission du formulaire au clic
+                    event.preventDefault();
+                    // Si nous ne sommes pas déjà sur la page de recherche, naviguer vers elle
+                    if (!window.location.href.includes('/search')) {
+                        window.location.href = "{{ route('search', ['q' => '']) }}";
+                    }
+                });
+            }
+            
+            // Initialisation de l'état du menu au chargement de la page
+            handleInitialState();
         });
     </script>
     

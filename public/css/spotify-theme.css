@@ -104,7 +104,7 @@ a:hover {
 .nav-link {
     display: flex;
     align-items: center;
-    padding: 8px 12px;
+    padding: 10px 10px;
     border-radius: 4px;
     transition: all 0.2s ease;
 }
@@ -127,7 +127,7 @@ a:hover {
 .main-content {
     flex: 1;
     overflow-y: auto;
-    padding: 16px 32px 32px;
+    padding: 16px 80px 32px;
     background: linear-gradient(to bottom, #343434, var(--spotify-black) 15%);
 }
 
@@ -149,10 +149,11 @@ a:hover {
 }
 
 .search-icon {
-    position: absolute;
-    left: 16px;
-    top: 50%;
+    position: relative;
+    left: 15px;
+    top: 40px;
     transform: translateY(-50%);
+    z-index: 10;
     color: var(--spotify-off-white);
     font-size: 16px;
 }
@@ -768,6 +769,8 @@ a:hover {
 .profile-icon {
     width: 44px;
     height: 44px;
+    right: 30px;
+    top: 35px;
     border-radius: 50%;
     background-color: var(--spotify-dark-gray);
     display: flex;
@@ -858,7 +861,7 @@ a:hover {
     }
     
     .nav-link {
-        justify-content: center;
+        justify-content: flex-start;
         padding: 12px;
     }
     
@@ -867,7 +870,7 @@ a:hover {
         font-size: 24px;
     }
     
-    .nav-link span {
+    .nav-link span{
         display: none;
     }
     
@@ -922,12 +925,6 @@ a:hover {
     .user-header {
         flex-direction: column;
         align-items: flex-start;
-    }
-    
-    .profile-icon {
-        position: absolute;
-        top: 20px;
-        right: 20px;
     }
 }
 
@@ -1355,4 +1352,311 @@ a:hover {
 .tier-progress-fill, .rewards-progress-fill, .spotvip-bar {
     background-color: var(--spotify-green) !important;
     box-shadow: 0 0 5px rgba(29, 185, 84, 0.3);
+}
+
+/* Styles globaux pour le menu burger - à ajouter dans spotify-theme.css */
+
+/* Variables pour la gestion du menu */
+:root {
+    --sidebar-collapsed-width: 0;
+    --sidebar-width-responsive: 80px;
+    --sidebar-transition: transform 0.3s ease, opacity 0.3s ease;
+    --overlay-bg: rgba(0, 0, 0, 0.7);
+}
+
+/* Structure de base */
+.main-container {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    position: relative;
+}
+
+.content-wrapper {
+    display: flex;
+    flex: 1;
+    overflow: hidden;
+    position: relative;
+}
+
+/* Overlay pour le menu mobile */
+.sidebar-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: var(--overlay-bg);
+    z-index: 998;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+.sidebar-overlay.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* Style de la sidebar */
+.sidebar {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: var(--sidebar-width);
+    height: 100vh;
+    background-color: var(--spotify-darker-black);
+    z-index: 999;
+    overflow-y: auto;
+    transform: translateX(-100%);
+    transition: var(--sidebar-transition);
+    padding: 24px 12px;
+    flex-direction: column;
+}
+
+.sidebar.open {
+    display: flex;
+    transform: translateX(0);
+}
+
+/* Bouton du menu burger */
+.menu-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    left: 20px;
+    border-radius: 50%;
+    background-color: var(--spotify-dark-gray);
+    border: none;
+    color: var(--spotify-white);
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    margin-right: 16px;
+}
+
+.menu-toggle:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.menu-toggle i {
+    font-size: 20px;
+}
+
+.menu-toggle, .profile-icon{
+    position: absolute;
+    z-index: 1000;
+    transform: scale(120%);
+}
+
+/* Contenu principal */
+.main-content {
+    width: 100%;
+    overflow: overlay;
+    transition: margin-left 0.3s ease, width 0.3s ease;
+}
+
+/* Animation du contenu lors de l'ouverture du menu */
+body.sidebar-open .main-content {
+    margin-left: 0;
+}
+
+body.sidebar-open .menu-toggle{
+    left: calc(var(--sidebar-width) + 20px);
+}
+
+/* Menu items */
+.nav-menu {
+    list-style: none;
+    margin-bottom: 24px;
+    padding: 0;
+}
+
+.nav-item {
+    margin-bottom: 12px;
+}
+
+.nav-link {
+    display: flex;
+    align-items: center;
+    border-radius: 4px;
+    color: var(--spotify-white);
+    transition: background-color 0.2s ease;
+    text-decoration: none;
+}
+
+.nav-link:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+    text-decoration: none;
+    color: var(--spotify-green);
+}
+
+.nav-link.active {
+    background-color: rgba(255, 255, 255, 0.2);
+}
+
+.nav-link i {
+    margin-right: 16px;
+    font-size: 20px;
+}
+
+/* Playlists */
+.playlist-actions {
+    margin-bottom: 16px;
+}
+
+.create-playlist-btn, .liked-songs-btn {
+    display: flex;
+    align-items: center;
+    background: none;
+    border: none;
+    color: var(--spotify-white);
+    padding: 10px 12px;
+    width: 100%;
+    text-align: left;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    border-radius: 4px;
+    margin-bottom: 8px;
+}
+
+.create-playlist-btn:hover, .liked-songs-btn:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+    color: var(--spotify-green);
+}
+
+.create-playlist-btn i, .liked-songs-btn i {
+    margin-right: 16px;
+    font-size: 18px;
+}
+
+.playlist-divider {
+    height: 1px;
+    background-color: rgba(255, 255, 255, 0.1);
+    margin: 12px 0;
+}
+
+.user-playlists {
+    overflow-y: auto;
+    flex-grow: 1;
+}
+
+.playlist-link {
+    display: block;
+    padding: 8px 12px;
+    color: var(--spotify-off-white);
+    transition: color 0.2s ease, background-color 0.2s ease;
+    border-radius: 4px;
+    margin-bottom: 4px;
+    text-decoration: none;
+}
+
+.playlist-link:hover {
+    color: var(--spotify-white);
+    background-color: rgba(255, 255, 255, 0.1);
+    text-decoration: none;
+}
+
+/* Adaptations responsives */
+@media (min-width: 1024px) {
+    /* Sur desktop */
+    .sidebar {
+        position: relative; /* Non fixe sur desktop */
+        transform: translateX(0); /* Toujours visible */
+        height: 100%;
+    }
+    
+    .sidebar:not(.open) {
+        transform: translateX(-100%);
+        width: 0;
+    }
+    
+    .content-wrapper {
+        flex-direction: row;
+    }
+    
+    body.sidebar-open .main-content {
+        width: calc(100% - var(--sidebar-width));
+    }
+    
+    .sidebar-overlay {
+        display: none !important; /* Jamais d'overlay sur desktop */
+    }
+}
+
+@media (max-width: 1023px) {
+    /* Sur tablette et mobile */
+    .sidebar {
+        transform: translateX(-100%); /* Toujours visible */
+        position: fixed;
+        height: calc(100% - var(--player-height));
+        width: var(--sidebar-width-responsive);
+    }
+
+    .nav-link > span, .liked-songs-btn > span, .create-playlist-btn > span{
+        display: none;
+    }
+    
+    .main-content {
+        width: 100%;
+        margin-left: 0;
+    }
+    
+    body.sidebar-open .main-content {
+        pointer-events: none; /* Empêche l'interaction avec le contenu quand le menu est ouvert */
+    }
+
+    .create-playlist-btn i, .liked-songs-btn i{
+        justify-content: flex-start;
+        transform: scale(1.8);
+    }
+
+    .nav-link i{
+        transform: scale(1.5);
+    }
+
+    .nav-link i, .create-playlist-btn i, .liked-songs-btn i{
+        margin-left: 5px;
+    } 
+
+    .player-right{
+        display: none;
+    }
+
+    .sidebar-logo{
+        display: none;
+    }
+
+    .playlist-link{
+        padding: 5px 0px;
+    }
+
+    body.sidebar-open .menu-toggle{
+        left: calc(var(--sidebar-width-responsive) + 20px);
+    }
+}
+
+@media (max-width: 480px) {
+    /* Sur très petits écrans */
+    .sidebar {
+        width: var(--sidebar-width-responsive); /* Menu plus large sur petit écran */
+    }
+    
+    .menu-toggle i {
+        font-size: 18px;
+    }
+}
+
+.top-search-container{
+    display: flex;
+    justify-content: center;
+    margin-bottom: 10%;
+    align-items: flex-end;
+}
+
+.sidebar-playlist{
+    display: flex;
+    width: calc(var(--sidebar-width-responsive) - 24px);
 }

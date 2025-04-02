@@ -8,6 +8,13 @@
     
     <ul class="nav-menu">
         <li class="nav-item">
+            <a href="{{ route('home') }}" class="nav-link {{ request()->routeIs('home') ? 'active' : '' }}">
+                <i class="fas fa-home"></i>
+                <span>Accueil</span>
+            </a>
+        </li>
+        <!-- Le lien de recherche a été supprimé, puisqu'il est remplacé par la barre de recherche globale -->
+        <li class="nav-item">
             <a href="{{ route('library') }}" class="nav-link {{ request()->routeIs('library') ? 'active' : '' }}">
                 <i class="fas fa-book"></i>
                 <span>Bibliothèque</span>
@@ -27,8 +34,6 @@
         </li>
     </ul>
     
-</div>
-    
     <div class="playlist-actions">
         <button class="create-playlist-btn">
             <i class="fas fa-plus"></i>
@@ -43,14 +48,13 @@
     <div class="playlist-divider"></div>
     
     <div class="user-playlists">
-        <a href="#" class="playlist-link">Playlist 1</a>
-        <a href="#" class="playlist-link">Playlist 2</a>
+        <a href="#" class="playlist-link">
+            <img src="img\playlist-1.png" alt="playlist 1">
+        </a>
+        <a href="#" class="playlist-link">Playlist</a>
+        <span>toz</span>
         <a href="#" class="playlist-link">Playlist 3</a>
         <a href="#" class="playlist-link">Playlist 4</a>
-        <a href="#" class="playlist-link">Soirée Summer</a>
-        <a href="#" class="playlist-link">Concentration</a>
-        <a href="#" class="playlist-link">Sport</a>
-        <a href="#" class="playlist-link">Chill</a>
     </div>
 </div>
 
