@@ -52,7 +52,6 @@
             <img src="img\playlist-1.png" alt="playlist 1">
         </a>
         <a href="#" class="playlist-link">Playlist</a>
-        <span>toz</span>
         <a href="#" class="playlist-link">Playlist 3</a>
         <a href="#" class="playlist-link">Playlist 4</a>
     </div>

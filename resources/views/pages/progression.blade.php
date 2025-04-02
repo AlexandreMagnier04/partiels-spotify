@@ -78,7 +78,7 @@
     @endif
 
     <div class="spotvip-rewards">
-        <h2 class="rewards-title">Récompenses des niveaux</h2>
+        <h2 class="rewards-title">Récompenses des Paliers</h2>
         <div class="rewards-timeline">
             <div class="timeline-line"></div>
             <div class="rewards-progress-bar">

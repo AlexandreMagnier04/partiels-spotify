@@ -64,8 +64,8 @@ class User extends Authenticatable
         $rewards = [
             ['level' => 5, 'reward' => 'Thèmes et couleurs de l’interface ', 'unlocked' => true],
             ['level' => 10, 'reward' => 'Places pour concert exclusif', 'unlocked' => true],
-            ['level' => 15, 'reward' => 'Premium 1 mois offert', 'unlocked' => true],
-            ['level' => 20, 'reward' => 'Rencontre avec artiste', 'unlocked' => false],
+            ['level' => 15, 'reward' => 'Préventes de billets !', 'unlocked' => true],
+            ['level' => 20, 'reward' => 'Premium 1 mois offert', 'unlocked' => false],
             ['level' => 25, 'reward' => 'Merchandising édition limitée', 'unlocked' => false],
         ];
         
