@@ -27,7 +27,7 @@
                     <div class="progress-fill" style="width: {{ $userProgress->getProgressPercentage() }}%"></div>
                 </div>
                 <div class="progress-info">
-                    <span>{{ $userProgress->getCurrentPoints() }} / {{ $userProgress->getMaxPoints() }} XP</span>
+                    <span>{{ $userProgress->getCurrentPoints() }} / {{ $userProgress->getMaxPoints() }} SPOINTS</span>
                 </div>
             </div>
         </div>
@@ -60,23 +60,39 @@
             <div class="badges-container">
                 <div class="badge-grid">
                     <div class="badge-item">
-                        <div class="badge-icon">★</div>
+                        <div class="badge-icon">
+                            <img src="/img/badge-1.png" alt="" style="width: 100px;display:flex; align-items: center;">
+                        </div>
                     </div>
                     <div class="badge-item">
-                        <div class="badge-icon">◼</div>
+                        <div class="badge-icon">
+                            <img src="/img/badge-2.png" alt="" style="width: 100px;display:flex; align-items: center;">
+                        </div>
                     </div>
                     <div class="badge-item">
-                        <div class="badge-icon">▲</div>
+                        <div class="badge-icon">
+                            <img src="/img/badge-3.png" alt="" style="width: 100px;display:flex; align-items: center;">
+
+                        </div>
                     </div>
                     <div class="badge-item">
-                        <div class="badge-icon">●</div>
+                        <div class="badge-icon">
+                            <img src="/img/badge-4.png" alt="" style="width: 100px;display:flex; align-items: center;">
+                        </div>
                     </div>
+
                     <div class="badge-item">
-                        <div class="badge-icon">◆</div>
+                        <div class="badge-icon">
+                            <img src="/img/badge-5.png" alt="" style="width: 100px;display:flex; align-items: center;">
+                        </div>
                     </div>
+                            
                     <div class="badge-item">
-                        <div class="badge-icon">▼</div>
+                        <div class="badge-icon">
+                            <img src="/img/badge-6.png" alt="" style="width: 100px;display:flex; align-items: center;">
+                        </div>
                     </div>
+                            
                 </div>
             </div>
         </div>
@@ -107,7 +123,6 @@
         margin: 0 auto;
     }
     
-    /* Header */
     .profile-header {
         display: flex;
         align-items: center;
@@ -186,7 +201,6 @@
         color: var(--spotify-off-white);
     }
     
-    /* Content */
     .profile-content {
         display: grid;
         grid-template-columns: 3fr 1fr;
@@ -207,7 +221,6 @@
         color: white;
     }
     
-    /* Playlists */
     .playlists-container {
         display: flex;
         gap: 15px;
@@ -254,7 +267,6 @@
         margin-left: 5px;
     }
     
-    /* Badges */
     .badges-section {
         grid-column: 2;
         grid-row: 1;
@@ -280,7 +292,6 @@
         font-size: 24px;
     }
     
-    /* Mix */
     .mix-container {
         display: flex;
         flex-direction: column;

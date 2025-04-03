@@ -80,7 +80,6 @@
                             <td class="text-center">
                                 <div class="popularity-bar">
                                     @php
-                                        // Simuler un score de popularité si non disponible
                                         $popularity = mt_rand(60, 90);
                                     @endphp
                                     <div class="progress" style="height: 4px;">
@@ -231,8 +230,6 @@
         const playAllButton = document.querySelector('.play-all');
         if (playAllButton) {
             playAllButton.addEventListener('click', function() {
-                // Dans une implémentation réelle, ceci lancerait la lecture de l'album
-                // Pour la démo, on change juste l'icône du bouton
                 const icon = this.querySelector('i');
                 if (icon.classList.contains('fa-play')) {
                     icon.classList.remove('fa-play');

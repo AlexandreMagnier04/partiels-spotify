@@ -24,36 +24,29 @@ class SpotifyController extends Controller
     public function __construct()
     {
         $this->client = new \GuzzleHttp\Client([
-            'verify' => false // Pour le développement uniquement
+            'verify' => false 
         ]);
         $this->client_id = 'a8f2de6dc1014b4a93e817594dd2b9bb';
         $this->client_secret = '27be8333e70146b697bccc7bb95d2541';
-        // Obtenir un token d'accès
         $this->api_token = $this->getSpotifyToken();
         
-        // Initialiser le progrès de l'utilisateur (dans un vrai projet, cela viendrait de la base de données)
+
         $this->initUserProgress();
     }
 
-    /**
-     * Initialiser les données de progression de l'utilisateur
-     */
+    //Initialiser les données de progression de l'utilisateur
     private function initUserProgress()
     {
-        // Dans un vrai projet, on récupérerait l'utilisateur connecté
-        // Ici on crée un utilisateur fictif de niveau 16 avec environ 600 XP
         $user = new User();
         $user->id = 1;
         $user->name = 'Hugo';
         $user->email = 'hugo@exemple.com';
         
-        // Utiliser la méthode getProgressData de l'utilisateur
         $this->user_progress = $user->getProgressData();
     }
 
-    /**
-     * Obtient un token d'accès Spotify
-     */
+    //Obtenir un token d'accès Spotify
+     
     private function getSpotifyToken()
     {
         try {
@@ -75,9 +68,8 @@ class SpotifyController extends Controller
         }
     }
 
-    /**
-     * Affiche la page d'accueil avec le nouveau design à 2 colonnes
-     */
+    //Affiche la page d'accueil
+
     public function index()
     {
         try {
@@ -88,7 +80,6 @@ class SpotifyController extends Controller
             $userPlaylists = $this->getUserPlaylists(4);
             $suggestedPlaylists = $this->getSuggestedPlaylists(4);
             
-            // IMPORTANT: Changer le chemin de la vue selon votre structure
             return view('pages.home', [
                 'userProgress' => $this->user_progress,
                 'suggestedAlbums' => $suggestedAlbums,
@@ -101,9 +92,7 @@ class SpotifyController extends Controller
         }
     }
 
-    /**
-     * Récupère les albums suggérés (nouveautés)
-     */
+    //Récupère les albums suggérés (nouveautés)
     private function getSuggestedAlbums()
     {
         try {
@@ -120,7 +109,6 @@ class SpotifyController extends Controller
             
             $suggestedAlbums = [];
             foreach ($objReleases->albums->items as $album) {
-                // Convertir la date de sortie en français
                 $frDate = Carbon::parse($album->release_date)->locale('fr')->translatedFormat('d F Y');
                 
                 $suggestedAlbums[] = new Album(
@@ -163,9 +151,8 @@ class SpotifyController extends Controller
         }
     }
 
-    /**
-     * Affiche la page de progression SPOT'VIP
-     */
+    //Affiche la page de progression SPOT'VIP
+
     public function progression()
     {
         return view('pages.progression', [
@@ -173,9 +160,8 @@ class SpotifyController extends Controller
         ]);
     }
 
-    /**
-     * Récupère les playlists de l'utilisateur
-     */
+    //Récupère les playlists de l'utilisateur
+     
     private function getUserPlaylists($limit = 4)
     {
         // Liste des images pour les playlists de l'utilisateur
@@ -228,9 +214,8 @@ class SpotifyController extends Controller
         return $playlists;
     }
 
-    /**
-     * Récupère les playlists suggérées pour l'utilisateur
-     */
+    //Récupère les playlists suggérées pour l'utilisateur
+     
     private function getSuggestedPlaylists($limit = 4)
     {
         try {
@@ -300,9 +285,8 @@ class SpotifyController extends Controller
         }
     }
 
-    /**
-     * Génère une liste de pistes simulées pour une playlist
-     */
+    // Génère une liste de pistes simulées pour une playlist
+     
     private function generatePlaylistTracks($count = 20)
     {
         $trackNames = [
@@ -334,7 +318,6 @@ class SpotifyController extends Controller
         
         $tracks = [];
         
-        // Utiliser seulement les $count premiers éléments des tableaux
         $count = min($count, count($trackNames));
         
         for ($i = 0; $i < $count; $i++) {
@@ -357,9 +340,8 @@ class SpotifyController extends Controller
         return $tracks;
     }
 
-    /**
-     * Affiche les détails d'une playlist
-     */
+    //Affiche les détails d'une playlist
+     
     public function playlistDetails($id)
     {
         try {
@@ -429,7 +411,6 @@ class SpotifyController extends Controller
                             }
                         }
                         
-                        // Formater la durée totale
                         $hours = floor($totalMs / 3600000);
                         $minutes = floor(($totalMs % 3600000) / 60000);
                         
@@ -462,7 +443,6 @@ class SpotifyController extends Controller
                 $res = $response->getBody();
                 $objPlaylist = json_decode($res);
                 
-                // Créer l'objet Playlist
                 $playlist = new Playlist(
                     $objPlaylist->id,
                     $objPlaylist->name,
@@ -493,7 +473,6 @@ class SpotifyController extends Controller
                     }
                 }
                 
-                // Calculer la durée totale
                 $totalMs = 0;
                 foreach ($tracks as $track) {
                     // Vérifier si la méthode getDurationMs existe, sinon utiliser la durée en propriété
@@ -536,158 +515,6 @@ class SpotifyController extends Controller
         }
     }
 
-    /**
-     * Récupère les favoris de l'utilisateur
-     */
-    private function getUserFavorites()
-    {
-        // Pour la démo, on utilise des données statiques
-        $favorites = [];
-        
-        // Images similaires à la capture d'écran 2
-        $images = [
-            '/img/covers/album1.jpg',
-            '/img/covers/album2.jpg',
-            '/img/covers/album3.jpg',
-            '/img/covers/album4.jpg'
-        ];
-        
-        $genres = ['Rap', 'Pop', 'Hip-hop', 'Électronique'];
-        
-        foreach ($images as $index => $image) {
-            $favorites[] = new Album(
-                'favorite-' . ($index + 1),
-                'Album ' . ($index + 1),
-                'Artiste ' . ($index + 1),
-                'artist-' . ($index + 1),
-                Carbon::now()->subDays(mt_rand(1, 365))->locale('fr')->translatedFormat('d F Y'),
-                mt_rand(8, 16),
-                $image,
-                null,
-                mt_rand(60, 90),
-                [$genres[$index]]
-            );
-        }
-        
-        return $favorites;
-    }
-
-    /**
-     * Récupère les nouveautés via l'API Spotify
-     */
-    private function getNewReleases()
-    {
-        try {
-            $response = $this->client->request('GET', 'https://api.spotify.com/v1/browse/new-releases?limit=10', [
-                'headers' => [
-                    'Authorization' => 'Bearer ' . $this->api_token,
-                    'Accept' => 'application/json',
-                ]
-            ]);
-
-            $res = $response->getBody();
-            $objReleases = json_decode($res);
-            
-            $newReleases = [];
-            foreach ($objReleases->albums->items as $album) {
-                // Convertir la date de sortie en français
-                $frDate = Carbon::parse($album->release_date)->locale('fr')->translatedFormat('d F Y');
-                
-                $newReleases[] = new Album(
-                    $album->id,
-                    $album->name,
-                    $album->artists[0]->name,
-                    $album->artists[0]->id,
-                    $frDate,
-                    $album->total_tracks,
-                    $album->images[0]->url
-                );
-            }
-            
-            return $newReleases;
-        } catch (\Exception $e) {
-            error_log('Erreur API Spotify (getNewReleases): ' . $e->getMessage());
-            
-            // En cas d'erreur, utiliser des données de substitution
-            $data = [
-                ['id' => 'album1', 'name' => 'New Release 1', 'artist' => 'Artist 1', 'image' => '/img/covers/album1.jpg'],
-                ['id' => 'album2', 'name' => 'New Release 2', 'artist' => 'Artist 2', 'image' => '/img/covers/album2.jpg'],
-                ['id' => 'album3', 'name' => 'New Release 3', 'artist' => 'Artist 3', 'image' => '/img/covers/album3.jpg'],
-                ['id' => 'album4', 'name' => 'New Release 4', 'artist' => 'Artist 4', 'image' => '/img/covers/album4.jpg']
-            ];
-            
-            $newReleases = [];
-            foreach ($data as $album) {
-                $newReleases[] = new Album(
-                    $album['id'],
-                    $album['name'],
-                    $album['artist'],
-                    'artist-id-' . rand(1, 1000),
-                    Carbon::now()->subDays(rand(1, 30))->locale('fr')->translatedFormat('d F Y'),
-                    rand(8, 16),
-                    $album['image']
-                );
-            }
-            
-            return $newReleases;
-        }
-    }
-
-    /**
-     * Récupère les playlists mises en avant via l'API Spotify
-     */
-    private function getFeaturedPlaylists()
-    {
-        try {
-            $response = $this->client->request('GET', 'https://api.spotify.com/v1/browse/featured-playlists?limit=10', [
-                'headers' => [
-                    'Authorization' => 'Bearer ' . $this->api_token,
-                    'Accept' => 'application/json',
-                ]
-            ]);
-
-            $res = $response->getBody();
-            $objPlaylists = json_decode($res);
-            
-            $featuredPlaylists = [];
-            foreach ($objPlaylists->playlists->items as $playlist) {
-                $featuredPlaylists[] = new Playlist(
-                    $playlist->id,
-                    $playlist->name,
-                    $playlist->description ?? '',
-                    $playlist->owner->display_name,
-                    $playlist->images[0]->url,
-                    $playlist->tracks->total
-                );
-            }
-            
-            return $featuredPlaylists;
-        } catch (\Exception $e) {
-            error_log('Erreur API Spotify (getFeaturedPlaylists): ' . $e->getMessage());
-            
-            // En cas d'erreur, utiliser des données de substitution
-            $data = [
-                ['id' => 'playlist1', 'name' => 'Featured Playlist 1', 'image' => '/img/covers/playlist-1.jpg'],
-                ['id' => 'playlist2', 'name' => 'Featured Playlist 2', 'image' => '/img/covers/playlist-2.jpg'],
-                ['id' => 'playlist3', 'name' => 'Featured Playlist 3', 'image' => '/img/covers/playlist-3.jpg'],
-                ['id' => 'playlist4', 'name' => 'Featured Playlist 4', 'image' => '/img/covers/playlist-4.jpg']
-            ];
-            
-            $featuredPlaylists = [];
-            foreach ($data as $playlist) {
-                $featuredPlaylists[] = new Playlist(
-                    $playlist['id'],
-                    $playlist['name'],
-                    'Playlist mise en avant selon vos goûts',
-                    'Spotify',
-                    $playlist['image'],
-                    rand(20, 50)
-                );
-            }
-            
-            return $featuredPlaylists;
-        }
-    }
 
     public function profile()
     {
@@ -716,12 +543,14 @@ class SpotifyController extends Controller
             'userPlaylists' => $userPlaylists
         ]);
     }
+    
     /**
  * Affiche les résultats de recherche ou la page d'exploration si aucune requête n'est spécifiée
  * 
  * @param Request $request
  * @return \Illuminate\View\View
  */
+
 public function search(Request $request)
 {
     $query = $request->input('q', '');
@@ -747,7 +576,7 @@ public function search(Request $request)
                     'type' => 'track,artist,album,playlist',
                     'limit' => 10
                 ],
-                'verify' => false // Pour environnement de développement uniquement - À retirer en production
+                'verify' => false 
             ]);
             
             $data = json_decode($response->getBody(), true);
@@ -776,8 +605,8 @@ public function search(Request $request)
                             $item['id'],
                             $item['name'],
                             $item['followers']['total'] ?? 0,
-                            $item['popularity'] ?? rand(50, 95),   // Popularité de l'artiste
-                            $item['genres'] ?? []                  // Genres de l'artiste
+                            $item['popularity'] ?? rand(50, 95),   
+                            $item['genres'] ?? []
                         );
                     }
 
@@ -790,7 +619,7 @@ public function search(Request $request)
                         $imageUrl = $item['images'][0]['url'];
                         $artist->setImageUrl($imageUrl);
                     } catch (\Exception $e) {
-                        // Log l'erreur
+                
                         error_log("Erreur lors de la définition de l'URL de l'image : " . $e->getMessage());
                     }
                 }
@@ -838,10 +667,9 @@ public function search(Request $request)
             ]);
             
         } catch (\Exception $e) {
-            // Log l'erreur
+
             error_log('Erreur API Spotify (search): ' . $e->getMessage());
             
-            // Utiliser des données de substitution en cas d'erreur
             $results = $this->getFallbackSearchResults($query);
             
             return view('pages.search', [
@@ -881,7 +709,7 @@ private function getMusicGenres()
                 'limit' => 40,
                 'locale' => 'fr_FR'
             ],
-            'verify' => false // Pour environnement de développement uniquement - À retirer en production
+            'verify' => false 
         ]);
         
         $data = json_decode($response->getBody(), true);
@@ -929,7 +757,7 @@ private function getFallbackSearchResults($query)
         $trackName = "Titre " . ($i + 1) . " (" . $query . ")";
         $artistName = "Artiste " . ($i + 1);
         $albumName = "Album " . ($i + 1);
-        $durationMs = rand(180000, 300000); // Entre 3 et 5 minutes
+        $durationMs = rand(180000, 300000);
         
         $results['tracks'][] = new Track(
             'track-' . ($i + 1),
@@ -947,11 +775,11 @@ private function getFallbackSearchResults($query)
     // Générer des artistes simulés
     for ($i = 0; $i < 4; $i++) {
         $artist = new Artist(
-            'artist-' . ($i + 1),                      // id
-            "Artiste " . ($i + 1) . " (" . $query . ")", // name
-            rand(10000, 1000000),                      // followers
-            rand(50, 95),                              // popularity (entre 50 et 95)
-            ['Pop', 'Rock', 'Hip-Hop']    // genres (un genre aléatoire)
+            'artist-' . ($i + 1),                     
+            "Artiste " . ($i + 1) . " (" . $query . ")",
+            rand(10000, 1000000),                     
+            rand(50, 95),                             
+            ['Pop', 'Rock', 'Hip-Hop'] 
         );
         
         $artist->setImageUrl('/img/artist-' . (($i % 4) + 1) . '.jpg');

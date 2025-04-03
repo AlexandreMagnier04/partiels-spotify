@@ -81,9 +81,6 @@ class UserProgress
         $this->history = $history;
     }
     
-    /**
-     * Ajoute des points au profil utilisateur
-     */
     public function addPoints(int $points, string $action)
     {
         $this->current_points += $points;
@@ -99,9 +96,8 @@ class UserProgress
         return $this->current_points;
     }
     
-    /**
-     * Calcule le pourcentage de progression dans le niveau actuel
-     */
+    //Calcule le pourcentage de progression dans le niveau actuel
+     
     public function getProgressPercentage()
     {
         if ($this->max_points == 0) return 0; // Éviter division par zéro
@@ -110,14 +106,13 @@ class UserProgress
         return min(100, $percentage); // Ne pas dépasser 100%
     }
     
-    /**
-     * Calcule le pourcentage de progression global pour la barre des récompenses
-     */
+    // Calcule le pourcentage de progression global pour la barre des récompenses
+    
     public function getRewardsProgressPercentage()
     {
         // Récupérer la dernière récompense (le niveau le plus élevé)
         $lastReward = end($this->rewards);
-        $highestRewardLevel = $lastReward['level'] ?? $this->level + 5; // Valeur par défaut si pas de récompense
+        $highestRewardLevel = $lastReward['level'] ?? $this->level + 5; 
         
         // Calculer le nombre total de points nécessaires pour atteindre le niveau le plus élevé
         $totalPointsNeeded = $this->getPointsForLevel($highestRewardLevel);
@@ -126,24 +121,22 @@ class UserProgress
         $currentTotalPoints = $this->getTotalPoints();
         
         // Calculer le pourcentage de progression
-        if ($totalPointsNeeded == 0) return 0; // Éviter division par zéro
+        if ($totalPointsNeeded == 0) return 0; 
         
         $percentage = ($currentTotalPoints / $totalPointsNeeded) * 100;
-        return min(100, $percentage); // Ne pas dépasser 100%
+        return min(100, $percentage);
     }
     
-    /**
-     * Retourne les points nécessaires pour atteindre un niveau
-     */
+    // Retourne les points nécessaires pour atteindre un niveau
+     
     public function getPointsForLevel(int $level)
     {
-        // Exemple simple: 1000 points par niveau
+
         return $level * 1000;
     }
     
-    /**
-     * Retourne le palier correspondant au nombre de points XP total
-     */
+    // Retourne le palier correspondant au nombre de points XP total
+     
     public function getCurrentTier()
     {
         $totalPoints = $this->getTotalPoints();
@@ -154,13 +147,11 @@ class UserProgress
             }
         }
         
-        // Si l'utilisateur a plus de points que le dernier palier défini
         return array_key_last($this->tiers);
     }
     
-    /**
-     * Retourne le prochain palier à atteindre
-     */
+    //Retourne le prochain palier à atteindre
+     
     public function getNextTier()
     {
         $currentTier = $this->getCurrentTier();
@@ -175,16 +166,14 @@ class UserProgress
         return $currentTier;
     }
     
-    /**
-     * Retourne le pourcentage de progression vers le prochain palier
-     */
+    // Retourne le pourcentage de progression vers le prochain palier
+    
     public function getTierProgressPercentage()
     {
         $totalPoints = $this->getTotalPoints();
         $currentTier = $this->getCurrentTier();
         $nextTier = $this->getNextTier();
         
-        // Déjà au palier maximum
         if ($currentTier === $nextTier) {
             return 100;
         }
@@ -195,40 +184,36 @@ class UserProgress
         $pointsRange = $nextTierMinXP - $currentTierMinXP;
         $userProgress = $totalPoints - $currentTierMinXP;
         
-        if ($pointsRange <= 0) return 100; // Protection
+        if ($pointsRange <= 0) return 100;
         
         $percentage = ($userProgress / $pointsRange) * 100;
-        return min(100, $percentage); // Ne pas dépasser 100%
+        return min(100, $percentage);
     }
     
-    /**
-     * Retourne les récompenses pour le palier actuel
-     */
+    //Retourne les récompenses pour le palier actuel
+     
     public function getCurrentTierRewards()
     {
         $currentTier = $this->getCurrentTier();
         return $this->tiers[$currentTier]['rewards'] ?? [];
     }
     
-    /**
-     * Retourne les récompenses pour le prochain palier
-     */
+    //Retourne les récompenses pour le prochain palier
+     
     public function getNextTierRewards()
     {
         $nextTier = $this->getNextTier();
         return $this->tiers[$nextTier]['rewards'] ?? [];
     }
     
-    /**
-     * Retourne les points restants pour atteindre le prochain palier
-     */
+    //Retourne les points restants pour atteindre le prochain palier
+     
     public function getPointsToNextTier()
     {
         $totalPoints = $this->getTotalPoints();
         $currentTier = $this->getCurrentTier();
         $nextTier = $this->getNextTier();
         
-        // Déjà au palier maximum
         if ($currentTier === $nextTier) {
             return 0;
         }
@@ -237,9 +222,8 @@ class UserProgress
         return max(0, $nextTierMinXP - $totalPoints);
     }
     
-    /**
-     * Retourne le niveau correspondant à un palier
-     */
+    //Retourne le niveau correspondant à un palier
+     
     public function getTierForLevel(int $level)
     {
         if ($level < 5) return 'Unranked';
@@ -249,9 +233,6 @@ class UserProgress
         return 'Platine';
     }
     
-    /**
-     * Getters
-     */
     public function getUserId()
     {
         return $this->user_id;
@@ -279,7 +260,6 @@ class UserProgress
     
     public function getTotalPoints()
     {
-        // Dans un vrai système, ce serait la somme de tous les points gagnés
         return $this->current_points + (($this->level - 1) * $this->max_points);
     }
     
@@ -309,11 +289,8 @@ class UserProgress
         return (1000 - ($temp % 1000));
     }
     
-    /**
-     * Retourne la couleur associée au niveau actuel
-     */
     public function getTierColor(string $tier)
     {
-        return $this->tier_colors[$tier] ?? '#1DB954'; // Couleur Spotify par défaut
+        return $this->tier_colors[$tier] ?? '#1DB954';
     }
 }

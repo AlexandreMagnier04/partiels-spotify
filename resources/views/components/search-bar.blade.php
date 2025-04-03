@@ -1,4 +1,3 @@
-<!-- resources/views/components/search-bar.blade.php -->
 <div class="top-search-container">
     <!-- Bouton du menu burger -->
     <button id="menu-toggle" class="menu-toggle">

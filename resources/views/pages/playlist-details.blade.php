@@ -355,16 +355,14 @@
         const trackItems = document.querySelectorAll('.track-item');
         trackItems.forEach(track => {
             track.addEventListener('click', function() {
-                // Simuler la lecture
                 const playIcon = this.querySelector('.play-track-overlay i');
                 if (playIcon.classList.contains('fa-play')) {
-                    // Réinitialiser tous les autres icônes
+            
                     document.querySelectorAll('.play-track-overlay i').forEach(icon => {
                         icon.classList.remove('fa-pause');
                         icon.classList.add('fa-play');
                     });
                     
-                    // Mettre à jour l'icône actuel
                     playIcon.classList.remove('fa-play');
                     playIcon.classList.add('fa-pause');
                 } else {

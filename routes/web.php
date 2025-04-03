@@ -3,11 +3,6 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\SpotifyController;
 
-/*
-|--------------------------------------------------------------------------
-| Web Routes
-|--------------------------------------------------------------------------
-*/
 
 // Routes principales
 Route::get('/', [SpotifyController::class, 'index'])->name('home');
@@ -36,7 +31,7 @@ Route::get('/made-for-you', [SpotifyController::class, 'madeForYou'])->name('mad
 Route::post('/add-points', [SpotifyController::class, 'addPoints'])->name('addPoints');
 Route::get('/action/{action}', [SpotifyController::class, 'simulateAction'])->name('simulateAction');
 
-// Fallback pour les routes non définies
+// Routes non définies
 Route::fallback(function () {
     return view('pages.error', ['message' => 'Cette page n\'existe pas.']);
 });

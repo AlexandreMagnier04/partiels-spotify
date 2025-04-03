@@ -13,7 +13,6 @@
                 <span>Accueil</span>
             </a>
         </li>
-        <!-- Le lien de recherche a été supprimé, puisqu'il est remplacé par la barre de recherche globale -->
         <li class="nav-item">
             <a href="{{ route('library') }}" class="nav-link {{ request()->routeIs('library') ? 'active' : '' }}">
                 <i class="fas fa-book"></i>

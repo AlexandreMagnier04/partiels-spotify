@@ -36,81 +36,51 @@ class Track
         $this->album_id = $album_id;
     }
 
-    /**
-     * Obtient l'identifiant de la piste
-     */
     public function getId()
     {
         return $this->id;
     }
 
-    /**
-     * Obtient le nom de la piste
-     */
     public function getName()
     {
         return $this->name;
     }
 
-    /**
-     * Obtient le nom de l'artiste
-     */
     public function getArtist()
     {
         return $this->artist;
     }
 
-    /**
-     * Obtient l'identifiant de l'artiste
-     */
     public function getArtistId()
     {
         return $this->artist_id;
     }
 
-    /**
-     * Obtient la durée en millisecondes
-     */
     public function getDurationMs()
     {
         return $this->duration_ms;
     }
 
-    /**
-     * Obtient l'URL du preview audio
-     */
     public function getPreviewUrl()
     {
         return $this->preview_url;
     }
 
-    /**
-     * Obtient l'URL de l'image
-     */
     public function getImageUrl()
     {
         return $this->image_url;
     }
 
-    /**
-     * Obtient le nom de l'album
-     */
     public function getAlbumName()
     {
         return $this->album_name;
     }
 
-    /**
-     * Obtient l'identifiant de l'album
-     */
     public function getAlbumId()
     {
         return $this->album_id;
     }
 
-    /**
-     * Formate la durée en MM:SS
-     */
     public function getFormattedDuration()
     {
         $minutes = floor($this->duration_ms / 60000);

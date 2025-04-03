@@ -25,7 +25,6 @@
         </div>
     </div>
 
-    <!-- Première section avec séparation verticale -->
     <div class="first-section">
         <!-- Mes playlists et suggestions de playlists -->
         <div class="section-row">
@@ -47,7 +46,6 @@
                 </div>
             </div>
             
-            <!-- Séparateur vertical -->
             <div class="vertical-divider"></div>
             
             <div class="column">
@@ -89,7 +87,6 @@
                 </div>
             </div>
             
-            <!-- Séparateur vertical -->
             <div class="vertical-divider"></div>
             
             <div class="column">
@@ -131,7 +128,6 @@
                 </div>
             </div>
             
-            <!-- Séparateur vertical -->
             <div class="vertical-divider"></div>
             
             <div class="column">
@@ -154,7 +150,6 @@
         </div>
     </div>
 
-    <!-- Deuxième section sans séparation verticale -->
     <div class="second-section">
         <h2 class="section-title spotify-green full-width-title">Nouveautés</h2>
         <div class="card-grid wide-grid">
@@ -249,7 +244,6 @@
         color: var(--spotify-off-white);
     }
     
-    /* Layout des sections */
     .first-section, .second-section {
         margin-bottom: 40px;
     }
@@ -292,19 +286,18 @@
     
     /* Grilles de cartes */
    
-    /* Réduire la taille de toutes les cards */
     .card-grid {
         display: grid;
         grid-template-columns: repeat(2, 1fr);
-        gap: 20px; /* Réduit l'espace entre les cartes */
+        gap: 20px;
     }
 
     .content-card {
         padding: 10px;
-        width: 15vw; /* Limite la largeur maximale */
+        width: 15vw;
         max-width: 250px;
         max-height: 350px;
-        margin: 0 auto; /* Centre si nécessaire */
+        margin: 0 auto;
         position: relative;
         overflow: hidden;
     }
@@ -369,26 +362,18 @@
         object-fit: cover;
     }
 
-    /* Pour les artistes (images circulaires) */
-    .artist-cover {
-        border-radius: 50%;
-    }
-
-    /* Pour les images de mix */
     .mix-cover img {
         width: 50px;
         height: 50px;
         object-fit: cover;
     }
 
-    /* Pour les images de playlist dans la page profil */
     .playlist-cover img {
         width: 100px;
         height: 100px;
         border-radius: 50%;
     }
-
-    /* Ajuster la grille des nouveautés */
+    
     .wide-grid {
         grid-template-columns: repeat(auto-fill, minmax(20vw, 1fr));
         gap: 15px;
@@ -400,7 +385,6 @@
         grid-template-columns: repeat(auto-fill, minmax(16vw, 1fr));
         }
 
-        /* Ajustements pour le menu burger en mode tablette */
         body.sidebar-open .main-content-inner {
             opacity: 0.7;
         }
@@ -443,7 +427,6 @@
             max-width: 100%;
         }
         
-        /* Ajustements pour le menu burger en mode mobile */
         .progress-section-left {
             margin-left: 0;
         }
@@ -495,12 +478,11 @@
 @push('scripts')
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        // Animation pour les playlists
+
         const playlistLinks = document.querySelectorAll('.playlist-link-card');
         
         playlistLinks.forEach(link => {
             link.addEventListener('click', function(e) {
-                // Si on clique sur l'icône de lecture, on empêche la navigation
                 if (e.target.closest('.play-overlay')) {
                     e.preventDefault();
                     

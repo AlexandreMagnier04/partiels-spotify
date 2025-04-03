@@ -183,7 +183,6 @@
         text-decoration: none;
     }
     
-    /* Table des titres */
     .tracks-table {
         margin-bottom: 30px;
     }
@@ -337,7 +336,6 @@
         padding-top: 8px;
     }
     
-    /* Message pas de résultats */
     .no-results {
         text-align: center;
         padding: 60px 0;
@@ -349,7 +347,6 @@
         margin-bottom: 10px;
     }
     
-    /* Grille des genres */
     .genres-container {
         padding: 20px 0;
     }
@@ -396,7 +393,6 @@
         z-index: 2;
     }
     
-    /* Animation pour les cartes */
     .animated-item {
         opacity: 0;
         transform: translateY(20px);
@@ -452,19 +448,16 @@
 @push('scripts')
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        // Animation d'entrée pour les cartes de genre
         const genreCards = document.querySelectorAll('.genre-card');
         genreCards.forEach((card, index) => {
             card.style.animationDelay = index * 50 + 'ms';
         });
         
-        // Gestion du survol pour les boutons de lecture
         const cards = document.querySelectorAll('.card');
         cards.forEach(card => {
             const playBtn = card.querySelector('.play-btn-overlay');
             
             if (playBtn) {
-                // Gestion du clic sur le bouton play
                 playBtn.addEventListener('click', function(e) {
                     e.stopPropagation();
                     

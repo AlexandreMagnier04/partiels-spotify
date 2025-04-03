@@ -5,7 +5,7 @@
 @section('content')
 <div class="progression-page {{ strtolower($userProgress->getCurrentTier()) }}-tier">
     <div class="progression-header">
-        <h1 class="progression-title">SPOT'VIP</h1>
+        <img src="/img/spotvip.png" style="width: 350px;" alt="">
         <p class="progression-subtitle">
             Gagnez des SPOINTS en écoutant de la musique, en créant des playlists et en interagissant avec les artistes. 
             Débloquez des récompenses exclusives en atteignant de nouveaux paliers !
@@ -31,11 +31,10 @@
         <h2 class="tier-title">Progression vers le prochain palier</h2>
         <div class="tier-details">
             <div class="tier-info">
-                <div class="current-tier">{{ $userProgress->getCurrentTier() }}</div>
+                <img src="/img/badge-or.png" alt="" style="width:200px;">
                 <span class="tier-arrow">→</span>
-                <div class="next-tier" style="background-color: rgba{{ str_replace('#', '(', $userProgress->getTierColor($userProgress->getNextTier())) }}, 0.6);">
-                    {{ $userProgress->getNextTier() }}
-                </div>
+                <img src="/img/badge-platine.png" alt="" style="width:200px;">
+                
                 <span class="tier-points">{{ number_format($userProgress->getPointsToNextTier()) }} SPOINTS restants</span>
             </div>
             <div class="tier-progress-bar">
@@ -233,7 +232,6 @@
         border-radius: 8px;
     }
     
-    /* Styles pour la barre de progression des récompenses */
     .rewards-progress-bar {
         position: absolute;
         top: 24px;

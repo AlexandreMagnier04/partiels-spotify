@@ -56,7 +56,7 @@
             </div>
         </div>
         
-        <!-- Caractéristiques audio et visualisations -->
+        <!-- Caractéristiques audio-->
         <div class="track-info-container">
             <div class="audio-player-section">
                 <h2>Extrait audio</h2>
@@ -74,7 +74,6 @@
             <div class="audio-features-section">
                 <h2>Caractéristiques audio</h2>
                 <div class="audio-features">
-                    <!-- Danceability -->
                     <div class="feature-item">
                         <div class="feature-value">{{ number_format($trackDetails->getDanceability() * 100) }}%</div>
                         <div class="feature-label">Danceability</div>
@@ -86,7 +85,6 @@
                         <div class="feature-description">Mesure à quel point le morceau est adapté à la danse.</div>
                     </div>
                     
-                    <!-- Energy -->
                     <div class="feature-item">
                         <div class="feature-value">{{ number_format($trackDetails->getEnergy() * 100) }}%</div>
                         <div class="feature-label">Energy</div>
@@ -98,14 +96,12 @@
                         <div class="feature-description">Représente l'intensité et l'activité perçues.</div>
                     </div>
                     
-                    <!-- Tempo -->
                     <div class="feature-item">
                         <div class="feature-value">{{ round($trackDetails->getTempo()) }}</div>
                         <div class="feature-label">Tempo (BPM)</div>
                         <div class="feature-description">Vitesse ou rythme estimé en battements par minute.</div>
                     </div>
                     
-                    <!-- Key & Mode -->
                     <div class="feature-item">
                         <div class="feature-value">{{ $trackDetails->getKeyName() }}</div>
                         <div class="feature-label">Tonalité <span class="badge">{{ $trackDetails->getModeName() }}</span></div>
@@ -153,7 +149,6 @@
 @push('scripts')
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        // Lecteur audio
         const audioPlayer = document.getElementById('audio-player');
         const playButton = document.querySelector('.play-track');
         
@@ -173,7 +168,6 @@
             });
         }
         
-        // Dropdown menu
         const dropdownToggle = document.querySelector('.dropdown-toggle');
         const dropdownMenu = document.querySelector('.dropdown-menu');
         
@@ -254,7 +248,6 @@
         font-size: 0.8rem;
     }
     
-    /* Audio player */
     .audio-player-section {
         margin-bottom: 40px;
     }
