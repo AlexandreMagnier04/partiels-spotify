@@ -212,6 +212,7 @@
         display: flex;
         gap: 15px;
         padding-bottom: 10px;
+        flex-wrap: wrap;
     }
     
     .playlist-item {
