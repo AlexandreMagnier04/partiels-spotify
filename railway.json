@@ -2,13 +2,13 @@
   "build": {
     "env": {
       "APP_ENV": "production",
-      "APP_KEY": "base64:xxxxxxxxxxxxxxxxxxxxxx",
+      "APP_KEY": "base64:xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
       "APP_DEBUG": "false",
       "APP_URL": "https://refont-spotify.up.railway.app"
     }
   },
   "deploy": {
-    "startCommand": "web: php -S 0.0.0.0:3000 -t public",
+    "startCommand": "php -S 0.0.0.0:3000 -t public",
     "healthcheckPath": "/",
     "restartPolicyType": "ON_FAILURE"
   }
