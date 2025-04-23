@@ -1,0 +1,15 @@
+{
+  "build": {
+    "env": {
+      "APP_ENV": "production",
+      "APP_KEY": "base64:...",
+      "APP_DEBUG": "false",
+      "APP_URL": "https://TONPROJET.up.railway.app"
+    }
+  },
+  "deploy": {
+    "startCommand": "php artisan serve --host=0.0.0.0 --port=3000",
+    "healthcheckPath": "/",
+    "restartPolicyType": "ON_FAILURE"
+  }
+}
